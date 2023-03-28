@@ -11,8 +11,12 @@ public class DiscordBotTests
     public async Task CanStartBot()
     {
         //Arrange.
-        IOptions<DiscordOptions> options = Options.Create<DiscordOptions>(new DiscordOptions());
+        DiscordOptions discordOptions = new()
+        {
+            DiscordToken = "invalid"
+        };
         var optionsMock = new Mock<IOptions<DiscordOptions>>();
+        optionsMock.Setup(x => x.Value).Returns(discordOptions);
         DiscordBot discordBot = new(optionsMock.Object);
 
         //Act.
