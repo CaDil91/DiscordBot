@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
@@ -9,9 +8,9 @@ namespace DiscordBot;
 public class DiscordBot
 {
     private readonly DiscordSocketClient _client;
-    private readonly IOptions<DiscordOptions> _discordOptions;
+    private readonly IOptions<DiscordBotOptions> _discordOptions;
 
-    public DiscordBot(IOptions<DiscordOptions> discordOptions)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters, you must enable the message cache in your config settings if you plan to use the cached message entity.
         var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
@@ -31,9 +30,9 @@ public class DiscordBot
 
         /*//Create basic commandHandler, and setup
         _commandHandler = new CommandHandler(_client, new CommandService(), _services);
-        await _commandHandler.InstallCommandsAsync();
+        await _commandHandler.InstallCommandsAsync();*/
 
-        await Task.CompletedTask;*/
+        await Task.CompletedTask;
     }
 
     /// <summary>

@@ -13,11 +13,11 @@ public static class DIRegistrations
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
         services.AddTransient<DiscordBot>();
-
-        services.AddOptions<DiscordOptions>()
+        
+        services.AddOptions<DiscordBotOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {
-                configuration.GetSection(DiscordOptions.SectionName).Bind(options);
+                configuration.GetSection(DiscordBotOptions.SectionName).Bind(options);
             });
 
         return services;
