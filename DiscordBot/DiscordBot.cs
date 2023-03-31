@@ -32,7 +32,8 @@ public class DiscordBot
         _commandHandler = new CommandHandler(_client, new CommandService(), _services);
         await _commandHandler.InstallCommandsAsync();*/
 
-        await Task.CompletedTask;
+        // Block this task until the program is closed.
+        await Task.Delay(Timeout.Infinite);
     }
 
     /// <summary>
