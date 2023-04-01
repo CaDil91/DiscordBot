@@ -6,4 +6,5 @@ public class DiscordBotOptions
 
     
     public string? DiscordToken { get; set; } 
+    public bool RegisterSlashCommands { get; set; } 
 }
