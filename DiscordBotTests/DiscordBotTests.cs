@@ -1,4 +1,5 @@
 ﻿using Discord.Net;
+using Discord.WebSocket;
 using Microsoft.Extensions.Options;
 using Moq;
 using NuGet.Frameworks;

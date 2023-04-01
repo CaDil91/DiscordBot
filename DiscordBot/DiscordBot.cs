@@ -1,11 +1,6 @@
-﻿using System.Diagnostics;
-using System.Net.Sockets;
-using System.Reactive.Subjects;
-using Discord;
-using Discord.Net;
+﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace DiscordBot;
 
@@ -26,17 +21,18 @@ public class DiscordBot
     {
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
-
-        //Register commands is a one time operation. Close bot after this. Try to let bot connect 3 times.
+        
+        // Commands only need to be registered once ever.
         if (_discordOptions.Value.RegisterSlashCommands)
         {
-            Thread.Sleep(6000); //Give time for bot to connect.
-            await RegisterSlashCommands("steam", "Search the steam store");
+            //await RegisterSlashCommands("steam", "Search the steam store");
             return; //Do not stay connected
         }
 
-        // Block this task until the program is closed.
-        await Task.Delay(Timeout.Infinite);
+        // Add listeners.
+        _client.SlashCommandExecuted += DiscordCommands.SlashCommandHandler;
+
+        await Task.Delay(Timeout.Infinite); // Block this task until the program is closed.
     }
 
     /// <summary>
@@ -47,6 +43,8 @@ public class DiscordBot
     /// <exception>Throws if _client has no guilds</exception>
     public async Task RegisterSlashCommands(string sName, string sDescription = "")
     {
+        Thread.Sleep(6000); //Give time for bot to connect.
+        
         //Create slash commands
         var guildCommand = new SlashCommandBuilder();
         guildCommand.WithName(sName); //Note: Names have to be all lowercase and match the regular expression ^[\w-]{3,32}$
@@ -67,5 +65,17 @@ public class DiscordBot
     public bool IsConnected()
     {
         return _client.ConnectionState == ConnectionState.Connected;
+    }
+}
+
+public static class DiscordCommands
+{
+    /// <summary>
+    /// Responds to Discord slash commands.
+    /// Documentation: https://discordnet.dev/guides/int_basics/application-commands/slash-commands/responding-to-slash-commands.html
+    /// </summary>
+    public static async Task SlashCommandHandler(SocketSlashCommand socketSlashCommand)
+    {
+        await socketSlashCommand.RespondAsync($"You executed {socketSlashCommand.Data.Name}");
     }
 }
