@@ -12,7 +12,15 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        services.AddTransient<DiscordBot>();
+        /*services.AddHttpClient<IHttpClient, SteamHttpClient>()
+            .ConfigureHttpClient(client =>
+            {
+                client.BaseAddress = new Uri("https://raw.githubusercontent.com/henrybeen/");
+            });*/
+        
+        services.AddTransient<SteamService>();
+        services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
+        services.AddSingleton<DiscordBot>();
         
         services.AddOptions<DiscordBotOptions>()
             .Configure<IConfiguration>((options, configuration) =>

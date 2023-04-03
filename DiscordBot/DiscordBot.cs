@@ -8,13 +8,15 @@ public class DiscordBot
 {
     private readonly DiscordSocketClient _client;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
+    private readonly IDiscordCommandHandler _discordCommandHandler;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordCommandHandler discordCommandHandler)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters, you must enable the message cache in your config settings if you plan to use the cached message entity.
         var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         _client = new DiscordSocketClient(discordSocketConfig);
         _discordOptions = discordOptions;
+        _discordCommandHandler = discordCommandHandler;
     }
 
     public async Task RunAsync()
@@ -30,7 +32,7 @@ public class DiscordBot
         }
 
         // Add listeners.
-        _client.SlashCommandExecuted += DiscordCommandHandler.HandleSlashCommand;
+        _client.SlashCommandExecuted += _discordCommandHandler.HandleCommand;
 
         await Task.Delay(Timeout.Infinite); // Block this task until the program is closed.
     }

@@ -3,33 +3,44 @@ using Discord.WebSocket;
 
 namespace DiscordBot;
 
-public static class DiscordCommandHandler
+public class DiscordCommandHandler : IDiscordCommandHandler
 {
-    static DiscordCommandHandler()
+    private readonly SteamService _steamService;
+
+    public DiscordCommandHandler(SteamService steamService)
     {
-        
+        _steamService = steamService;
     }
     
     /// <summary>
-    /// Re-routed entry point for all command types
+    /// Primary entry point for all command types.
     /// </summary>
-    /// <param name="command"></param>
-    public static async Task HandleCommand(IApplicationCommandInteraction? command)
+    /// <param name="command">returns null if no response message</param>
+    public async Task<string?> HandleCommand(IApplicationCommandInteraction? command)
     {
-        if (command?.Data?.Name == null || string.IsNullOrEmpty(command?.Data?.Name)) return;
-        string sCommandName = command.Data.Name;
+        if (command?.Data?.Name == null || string.IsNullOrEmpty(command.Data?.Name)) return null;
         
-        switch (sCommandName)
+        string sCommandName = command.Data.Name;
+        string? sResponse = null;
+
+        //Handle command types. Cleaner way than an expanding switch statement?
+        switch (command)
         {
-            case "steam":
-                //TODO: await _steamService.SteamStoreSearchHandler(command.Data?.Options?.FirstOrDefault()?.Value?.ToString() ?? "");
+            case SocketSlashCommand socketSlashCommand:
+                await HandleSlashCommand(socketSlashCommand);
+                
                 break;
         }
+
+        return sResponse;
     }
 
     /// <summary>
     /// Responds to Discord slash commands.
     /// Documentation: https://discordnet.dev/guides/int_basics/application-commands/slash-commands/responding-to-slash-commands.html
     /// </summary>
-    public static async Task HandleSlashCommand(SocketSlashCommand socketSlashCommand) => await HandleCommand(socketSlashCommand);
+    private async Task<string?> HandleSlashCommand(SocketSlashCommand socketSlashCommand)
+    { 
+        return await _steamService.SearchStore(socketSlashCommand.Data?.Options?.FirstOrDefault()?.Value?.ToString() ?? "");
+    }
 }

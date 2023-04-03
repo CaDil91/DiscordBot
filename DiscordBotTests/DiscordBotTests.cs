@@ -1,23 +1,26 @@
-﻿using Discord.Net;
-using Discord.WebSocket;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Moq;
-using NuGet.Frameworks;
 
 namespace DiscordBot;
 
 public class DiscordBotTests
 {
-    private Mock<IOptions<DiscordBotOptions>> _discordOptions = new();
+    private readonly Mock<SteamService> _steamServiceMock;
+    private readonly Mock<IOptions<DiscordBotOptions>> _optionsMock;
 
+    public DiscordBotTests()
+    {
+        _steamServiceMock = new Mock<SteamService>();
+        _optionsMock = new Mock<IOptions<DiscordBotOptions>>();
+    }
+    
     [Fact]
     public async Task RegisterSlashCommandsThrowsIfRegisteringWithoutConnecting()
     {
         //Arrange.
-        DiscordBotOptions discordBotOptions = new();
-        var optionsMock = new Mock<IOptions<DiscordBotOptions>>();
-        optionsMock.Setup(x => x.Value).Returns(discordBotOptions);
-        DiscordBot discordBot = new(optionsMock.Object);
+        _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
+        var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
+        DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
 
         //Act and Assert.
         var exception = await Assert.ThrowsAsync<Exception>(() => discordBot.RegisterSlashCommands("invalid",
@@ -36,7 +39,8 @@ public class DiscordBotTests
         };
         var optionsMock = new Mock<IOptions<DiscordBotOptions>>();
         optionsMock.Setup(x => x.Value).Returns(discordBotOptions);
-        DiscordBot discordBot = new(optionsMock.Object);
+        var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
+        DiscordBot discordBot = new(optionsMock.Object, discordCommandHandler);
 
         //Act.
         Task _ = discordBot.RunAsync();
