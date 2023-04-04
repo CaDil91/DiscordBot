@@ -1,8 +1,8 @@
-﻿using Discord;
+﻿using Discord.WebSocket;
 
 namespace DiscordBot;
 
 public interface IDiscordCommandHandler
 {
-    public Task<string?> HandleCommand(IApplicationCommandInteraction? command);
+    public Task HandleSlashCommandAsync(SocketSlashCommand command);
 }

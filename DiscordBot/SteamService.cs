@@ -2,9 +2,10 @@
 
 public class SteamService
 {
-    public async Task<string> SearchStore(string? searchTerm)
+    public async Task<string> SearchStoreAsync(string? searchTerm)
     {
-        throw new Exception("Not yet implemented");
+        //throw new Exception("Not yet implemented");
+        return "SteamGame";
     }
 
 }

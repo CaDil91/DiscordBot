@@ -5,36 +5,22 @@ namespace DiscordBot;
 
 public class DiscordCommandHandlerTests
 {
-    private readonly Mock<SteamService> _steamServiceMock;
+    private readonly DiscordCommandHandler _subjectUnderTest;
 
     public DiscordCommandHandlerTests()
     {
-        _steamServiceMock = new Mock<SteamService>();
-    }
-
-    //TODO: 
-    [Fact]
-    public async Task SlashCommandHandlerDoesNotThrowWithNullParameter()
-    {
-        //Arrange.
-        var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
-        
-        //Act.
-        //Exception? exception = await Record.ExceptionAsync(() => discordCommandHandler.HandleSlashCommand(null));
-        
-        //Assert.
-        //Assert.Null(exception);
+        _subjectUnderTest = new DiscordCommandHandler(new Mock<SteamService>().Object);
     }
     
     [Fact]
-    public async Task HandleCommandCanHandleNullCommands()
+    public async Task HandleSlashCommand_DoesntThrow()
     {
         //Arrange.
-        var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
-        
+        await _subjectUnderTest.HandleSlashCommandAsync(null);
+
         //Act.
-        Exception? exception = await Record.ExceptionAsync(() => discordCommandHandler.HandleCommand(null));
-        
+        Exception? exception = await Record.ExceptionAsync(() => _subjectUnderTest.HandleSlashCommandAsync(null));
+
         //Assert.
         Assert.Null(exception);
     }

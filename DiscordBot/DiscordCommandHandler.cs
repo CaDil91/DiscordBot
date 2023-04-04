@@ -1,5 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace DiscordBot;
 
@@ -11,36 +11,37 @@ public class DiscordCommandHandler : IDiscordCommandHandler
     {
         _steamService = steamService;
     }
-    
-    /// <summary>
-    /// Primary entry point for all command types.
-    /// </summary>
-    /// <param name="command">returns null if no response message</param>
-    public async Task<string?> HandleCommand(IApplicationCommandInteraction? command)
-    {
-        if (command?.Data?.Name == null || string.IsNullOrEmpty(command.Data?.Name)) return null;
-        
-        string sCommandName = command.Data.Name;
-        string? sResponse = null;
-
-        //Handle command types. Cleaner way than an expanding switch statement?
-        switch (command)
-        {
-            case SocketSlashCommand socketSlashCommand:
-                await HandleSlashCommand(socketSlashCommand);
-                
-                break;
-        }
-
-        return sResponse;
-    }
 
     /// <summary>
     /// Responds to Discord slash commands.
+    /// After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message immediately using RespondAsync()
+    /// or you can choose to send a deferred response with DeferAsync(). If choosing a deferred response, the user will see a loading state for the interaction,
+    /// and you'll have up to 15 minutes to edit the original deferred response using ModifyOriginalResponseAsync(). You can read more about response types here
     /// Documentation: https://discordnet.dev/guides/int_basics/application-commands/slash-commands/responding-to-slash-commands.html
+    /// Response Types: https://discord.com/developers/docs/interactions/application-commands
     /// </summary>
-    private async Task<string?> HandleSlashCommand(SocketSlashCommand socketSlashCommand)
-    { 
-        return await _steamService.SearchStore(socketSlashCommand.Data?.Options?.FirstOrDefault()?.Value?.ToString() ?? "");
+    public async Task HandleSlashCommandAsync(SocketSlashCommand? socketSlashCommand)
+    {
+        if (socketSlashCommand == null) return;
+        
+        //Setup
+        var sResponse = "Sorry, I don't know how to handle that slash command.";
+        await socketSlashCommand.DeferAsync();
+        
+        string sCommandName = socketSlashCommand.Data?.Name ?? "";
+        switch (sCommandName)
+        {
+            case "steam":
+                string sSearchTerm = socketSlashCommand.Data?.Options?.FirstOrDefault()?.Value?.ToString() ?? "";
+                if (string.IsNullOrEmpty(sSearchTerm))
+                {
+                    sResponse = "No search term found.";
+                    break;
+                }
+                sResponse = await _steamService.SearchStoreAsync(sSearchTerm);
+                break;
+        }
+
+        await socketSlashCommand.RespondAsync(sResponse);
     }
 }

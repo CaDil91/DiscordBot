@@ -15,20 +15,6 @@ public class DiscordBotTests
     }
     
     [Fact]
-    public async Task RegisterSlashCommandsThrowsIfRegisteringWithoutConnecting()
-    {
-        //Arrange.
-        _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
-        var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
-        DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
-
-        //Act and Assert.
-        var exception = await Assert.ThrowsAsync<Exception>(() => discordBot.RegisterSlashCommands("invalid",
-            "should unregister this command"));
-        Assert.Equal("Discord bot is not connected any guilds", exception.Message);
-    }
-
-    [Fact]
     public void CanStartBotInFiveSeconds()
     {
         //Arrange.
@@ -49,5 +35,29 @@ public class DiscordBotTests
 
         //Assert.
         Assert.True(connected);
+    }
+    
+    [Fact]
+    public async Task RegisterSlashCommandsThrowsIfRegisteringWithoutConnecting()
+    {
+        //Arrange.
+        _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
+        var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
+        DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
+
+        //Act and Assert.
+        var exception = await Assert.ThrowsAsync<Exception>(() => discordBot.RegisterSlashCommands("invalid",
+            "should unregister this command"));
+        Assert.Equal("Discord bot is not connected any guilds", exception.Message);
+    }
+
+    [Fact]
+    public void SlashCommandsRespondsInTime()
+    {
+        //Arrange.
+
+        //Act.
+
+        //Assert.
     }
 }
