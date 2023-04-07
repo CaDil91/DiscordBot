@@ -33,4 +33,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\SteamServices\SteamServices.csproj" />
+    </ItemGroup>
+
 </Project>
