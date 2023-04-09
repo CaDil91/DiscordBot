@@ -4,5 +4,5 @@ namespace DiscordBot;
 
 public interface IDiscordCommandHandler
 {
-    public Task HandleSlashCommandAsync(SocketSlashCommand command);
+    public Task HandleSlashCommandAsync(SocketSlashCommand commandWrapper);
 }

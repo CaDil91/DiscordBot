@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot", "DiscordBot\Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBotTests", "DiscordBotTests\DiscordBotTests.csproj", "{B5BAAE92-59EC-40CE-B672-D204EEA33210}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamServices", "SteamServices\SteamServices.csproj", "{0F48CC20-3912-4C12-9A03-9DE975518913}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,11 @@ Global
 		{B5BAAE92-59EC-40CE-B672-D204EEA33210}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5BAAE92-59EC-40CE-B672-D204EEA33210}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5BAAE92-59EC-40CE-B672-D204EEA33210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F48CC20-3912-4C12-9A03-9DE975518913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F48CC20-3912-4C12-9A03-9DE975518913}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F48CC20-3912-4C12-9A03-9DE975518913}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F48CC20-3912-4C12-9A03-9DE975518913}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

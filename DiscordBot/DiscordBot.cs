@@ -7,8 +7,8 @@ namespace DiscordBot;
 public class DiscordBot
 {
     private readonly DiscordSocketClient _client;
-    private readonly IOptions<DiscordBotOptions> _discordOptions;
     private readonly IDiscordCommandHandler _discordCommandHandler;
+    private readonly IOptions<DiscordBotOptions> _discordOptions;
 
     public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordCommandHandler discordCommandHandler)
     {
@@ -23,7 +23,7 @@ public class DiscordBot
     {
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
-        
+
         // Commands only need to be registered once ever.
         if (_discordOptions.Value.RegisterSlashCommands)
         {
@@ -38,7 +38,7 @@ public class DiscordBot
     }
 
     /// <summary>
-    /// Register slash commands.
+    ///     Register slash commands.
     /// </summary>
     /// <param name="sName"></param>
     /// <param name="sDescription"></param>
@@ -46,7 +46,7 @@ public class DiscordBot
     public async Task RegisterSlashCommands(string sName, string sDescription = "")
     {
         Thread.Sleep(6000); //Give time for bot to connect.
-        
+
         //Create slash commands
         SlashCommandBuilder? guildCommand = new SlashCommandBuilder()
             .WithName(sName) //Note: Names have to be all lowercase and match the regular expression ^[\w-]{3,32}$
@@ -56,7 +56,7 @@ public class DiscordBot
         //Create slash command.
         SocketGuild? socketGuild = _client.Guilds?.FirstOrDefault();
         if (socketGuild == null) throw new Exception("Discord bot is not connected any guilds");
-        
+
         SocketGuild guild = _client.GetGuild(socketGuild.Id);
         await guild.CreateApplicationCommandAsync(guildCommand.Build());
     }

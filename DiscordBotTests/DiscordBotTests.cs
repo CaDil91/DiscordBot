@@ -1,30 +1,32 @@
 ﻿using Microsoft.Extensions.Options;
 using Moq;
+using SteamServices;
 
 namespace DiscordBot;
 
 public class DiscordBotTests
 {
-    private readonly Mock<SteamService> _steamServiceMock;
     private readonly Mock<IOptions<DiscordBotOptions>> _optionsMock;
+    private readonly Mock<StoreService> _steamServiceMock;
 
     public DiscordBotTests()
     {
-        _steamServiceMock = new Mock<SteamService>();
+        _steamServiceMock = new Mock<StoreService>();
         _optionsMock = new Mock<IOptions<DiscordBotOptions>>();
     }
-    
+
     [Fact]
     public void CanStartBotInFiveSeconds()
     {
         //Arrange.
+        //TODO: Test options?
         DiscordBotOptions discordBotOptions = new()
         {
-            //TODO: Test options?
             DiscordToken = "MTAwMzA3NTcxMzAwNTUzMTIxNg.GsL_2g.7DxQHrpK31n1Bz6OxRYyMjl3xQD6U9Vvbowbuo"
         };
         var optionsMock = new Mock<IOptions<DiscordBotOptions>>();
         optionsMock.Setup(x => x.Value).Returns(discordBotOptions);
+
         var discordCommandHandler = new DiscordCommandHandler(_steamServiceMock.Object);
         DiscordBot discordBot = new(optionsMock.Object, discordCommandHandler);
 
@@ -36,7 +38,7 @@ public class DiscordBotTests
         //Assert.
         Assert.True(connected);
     }
-    
+
     [Fact]
     public async Task RegisterSlashCommandsThrowsIfRegisteringWithoutConnecting()
     {
@@ -49,15 +51,5 @@ public class DiscordBotTests
         var exception = await Assert.ThrowsAsync<Exception>(() => discordBot.RegisterSlashCommands("invalid",
             "should unregister this command"));
         Assert.Equal("Discord bot is not connected any guilds", exception.Message);
-    }
-
-    [Fact]
-    public void SlashCommandsRespondsInTime()
-    {
-        //Arrange.
-
-        //Act.
-
-        //Assert.
     }
 }

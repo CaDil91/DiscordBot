@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SteamServices;
 
 namespace DiscordBot;
 
@@ -12,16 +13,13 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        /*services.AddHttpClient<IHttpClient, SteamHttpClient>()
-            .ConfigureHttpClient(client =>
-            {
-                client.BaseAddress = new Uri("https://raw.githubusercontent.com/henrybeen/");
-            });*/
-        
-        services.AddTransient<SteamService>();
+        services.AddHttpClient("hardcodedsteam",
+            client => { client.BaseAddress = new Uri("https://store.steampowered.com"); });
+
+        services.AddTransient<StoreService>();
         services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
         services.AddSingleton<DiscordBot>();
-        
+
         services.AddOptions<DiscordBotOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {

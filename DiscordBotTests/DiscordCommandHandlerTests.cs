@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
 using Moq;
+using SteamServices;
 
 namespace DiscordBot;
 
@@ -9,19 +10,18 @@ public class DiscordCommandHandlerTests
 
     public DiscordCommandHandlerTests()
     {
-        _subjectUnderTest = new DiscordCommandHandler(new Mock<SteamService>().Object);
+        _subjectUnderTest = new DiscordCommandHandler(new Mock<StoreService>().Object);
     }
-    
+
     [Fact]
-    public async Task HandleSlashCommand_DoesntThrow()
+    public async Task HandleSlashCommandAsync_HandlesInvalidSlashCommand()
     {
-        //Arrange.
-        await _subjectUnderTest.HandleSlashCommandAsync(null);
-
-        //Act.
-        Exception? exception = await Record.ExceptionAsync(() => _subjectUnderTest.HandleSlashCommandAsync(null));
-
-        //Assert.
-        Assert.Null(exception);
+        // Arrange.
+        var slashCommand = new Mock<SlashCommandWrapper>();
+        
+        // Act.
+        await _subjectUnderTest.HandleSlashCommandAsync(slashCommand.Object);
+        
+        // Assert.
     }
 }
