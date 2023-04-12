@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using SteamServices;
 
 namespace DiscordBot;
@@ -19,11 +21,12 @@ public static class DIRegistrations
         services.AddTransient<StoreService>();
         services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
         services.AddSingleton<DiscordBot>();
+        services.AddLogging(x => x.AddConsole());
 
         services.AddOptions<DiscordBotOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {
-                configuration.GetSection(DiscordBotOptions.SectionName).Bind(options);
+                configuration.GetSection(DiscordBotOptions.SECTION_NAME).Bind(options);
             });
 
         return services;

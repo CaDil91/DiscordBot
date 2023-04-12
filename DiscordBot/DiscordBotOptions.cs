@@ -2,9 +2,8 @@ namespace DiscordBot;
 
 public class DiscordBotOptions
 {
-    public const string SectionName = "DiscordBot";
+    public const string SECTION_NAME = "DiscordBot";
 
 
     public string? DiscordToken { get; set; }
-    public bool RegisterSlashCommands { get; set; }
 }

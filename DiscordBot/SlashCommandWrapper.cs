@@ -4,17 +4,28 @@ namespace DiscordBot;
 
 public class SlashCommandWrapper
 {
-    public SocketSlashCommand SlashCommand { get; set; }
-    public const string INVALID_COMMAND = "invalid_command"; 
+    public bool IsValidCommand { get; set; } = false;
+    public SocketSlashCommand? SlashCommand { get; set; }
     
-    private bool _hasResponded;
-    public bool HasResponded { get => SlashCommand.HasResponded;  set => _hasResponded = value; }
+    public bool HasResponded { get; set; }
 
-    private string _sCommandName = INVALID_COMMAND;
-    public string CommandName { get => SlashCommand.CommandName; set => _sCommandName = value; }
+    public string CommandName { get; set; } = string.Empty;
 
-    public SlashCommandWrapper(SocketSlashCommand slashCommand)
+    /// <summary>
+    /// Default construction. Creates invalid command.
+    /// </summary>
+    public SlashCommandWrapper()
     {
-        SlashCommand = slashCommand;
+        SlashCommand = null;
+    }
+
+    public SlashCommandWrapper(SocketSlashCommand? slashCommand)
+    {
+        if (slashCommand != null) SlashCommand = slashCommand;
+    }
+
+    public async Task RespondAsync(string sResponseMessage)
+    {
+        if (SlashCommand != null) await SlashCommand.RespondAsync(sResponseMessage);
     }
 }

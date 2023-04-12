@@ -23,13 +23,13 @@ public class DiscordBot
     {
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
-
+        
+#if REGISTER_COMMANDS
+        //TODO: move to other project
         // Commands only need to be registered once ever.
-        if (_discordOptions.Value.RegisterSlashCommands)
-        {
-            await RegisterSlashCommands("steam", "Search the steam store");
-            return; //Do not stay connected
-        }
+        await RegisterSlashCommands("steam", _client.Guilds?.FirstOrDefault(), "Search the steam store");
+        return; //Do not stay connected
+#endif
 
         // Add listeners.
         _client.SlashCommandExecuted += _discordCommandHandler.HandleSlashCommandAsync;
@@ -41,9 +41,10 @@ public class DiscordBot
     ///     Register slash commands.
     /// </summary>
     /// <param name="sName"></param>
+    /// <param name="socketGuild"></param>
     /// <param name="sDescription"></param>
     /// <exception>Throws if _client has no guilds</exception>
-    public async Task RegisterSlashCommands(string sName, string sDescription = "")
+    public async Task RegisterSlashCommands(string sName, SocketGuild? socketGuild, string sDescription = "")
     {
         Thread.Sleep(6000); //Give time for bot to connect.
 
@@ -54,11 +55,9 @@ public class DiscordBot
             .AddOption("title", ApplicationCommandOptionType.String, "Steam title to search the store for.");
 
         //Create slash command.
-        SocketGuild? socketGuild = _client.Guilds?.FirstOrDefault();
         if (socketGuild == null) throw new Exception("Discord bot is not connected any guilds");
-
-        SocketGuild guild = _client.GetGuild(socketGuild.Id);
-        await guild.CreateApplicationCommandAsync(guildCommand.Build());
+        
+        await socketGuild.CreateApplicationCommandAsync(guildCommand.Build());
     }
 
     /// <summary>

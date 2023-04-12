@@ -27,7 +27,7 @@ public class StoreService
     /// <param name="searchTerm">The search parameter to query to the Steam Store by.</param>
     /// <returns>List of App Id's for the given search</returns>
     public async Task<List<JObject>> GetAppFromStoreAsync(string? searchTerm, int iAppReturnCountMax = 10,
-        List<SortBy> listSortBy = null)
+        List<SortBy>? listSortBy = null)
     {
         List<JObject> retListAppIds = new() { new JObject() };
 
