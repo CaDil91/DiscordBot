@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DiscordBot.DiscordBot;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot;
 

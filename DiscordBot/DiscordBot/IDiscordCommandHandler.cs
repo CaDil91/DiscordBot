@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 
-namespace DiscordBot;
+namespace DiscordBot.DiscordBot;
 
 public interface IDiscordCommandHandler
 {

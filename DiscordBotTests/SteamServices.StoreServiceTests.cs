@@ -11,6 +11,7 @@ public class SteamServicesStoreServiceTests
 
     public SteamServicesStoreServiceTests()
     {
+        //Create http client factory mock, and "hardcodedsteam"
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var result = new HttpResponseMessage();
         handlerMock
@@ -24,40 +25,19 @@ public class SteamServicesStoreServiceTests
         {
             BaseAddress = new Uri("https://store.steampowered.com")
         };
-
         _mockHttpClientFactory.Setup(_ => _.CreateClient("hardcodedsteam")).Returns(httpClient);
 
         _subjectUnderTest = new StoreService(_mockHttpClientFactory.Object);
     }
 
     [Fact]
-    public async Task SearchStoreAsync_CanMakeHttpRequestsToStore()
+    public async Task SearchStoreAsync_()
     {
         //Arrange.
         //Act.
-        HttpResponseMessage response = await _subjectUnderTest.RequestSteamStore();
+        List<SteamApp> steamApps = await _subjectUnderTest.GetAppsFromStoreAsync("halo");
 
         //Assert.
-        Assert.True(response.IsSuccessStatusCode);
-    }
-
-    [Fact]
-    public async Task SearchStoreAsync_ReturnsListOfAppIds()
-    {
-        //Arrange.
-
-        //Act.
-
-        //Assert.
-    }
-
-    [Fact]
-    public async Task SearchStoreAsync_ReturnsErrorResponseIfNoAppsFound()
-    {
-        //Arrange.
-
-        //Act.
-
-        //Assert.
+        Assert.NotNull(steamApps);
     }
 }

@@ -1,0 +1,33 @@
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+
+namespace DiscordBot.DiscordBot;
+
+public class DiscordCommandHandlerTests
+{
+    private readonly Mock<ILogger<DiscordCommandHandler>> _loggerMock = new();
+
+    private readonly DiscordCommandHandler _subjectUnderTest;
+
+    public DiscordCommandHandlerTests()
+    {
+        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object);
+    }
+
+    [Fact]
+    public async Task SocketSlashCommand_HandleSlashCommandAsync_LogsWarningForNullCommand()
+    {
+        // Arrange.
+        // Act.
+        await _subjectUnderTest.HandleSlashCommandAsync(null);
+        
+        // Assert
+        _loggerMock.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString() == "Null command received."),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
+    }
+}
