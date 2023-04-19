@@ -31,10 +31,10 @@ public class StoreService
     /// 
     /// </summary>
     /// <param name="httpClientFactory"></param>
-    public StoreService(IHttpClientFactory httpClientFactory, AzureEncryptionService azureEncryptionService)
+    public StoreService(IHttpClientFactory httpClientFactory)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
-        _azureEncryptionService = azureEncryptionService;
+        //_azureEncryptionService = azureEncryptionService;
     }
 
     /// <summary>
@@ -48,8 +48,9 @@ public class StoreService
     {
         List<SteamApp> steamApps = new();
 
-        HttpResponseMessage sResponse = await _httpClient
+        /*HttpResponseMessage sResponse = await _httpClient
             .GetAsync($"https://api.steampowered.com/ISteamApps/GetAppList/v2/?key={_azureEncryptionService.DecryptAsync(Convert.FromBase64String(steamSettings.Value.Token)).Result}");
+            */
 
         //throw new Exception("Not yet implemented");
         return steamApps;
