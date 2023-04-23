@@ -1,40 +1,30 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Options;
 
 namespace SteamServices;
 
 public class StoreService
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public enum SortBy
     {
         MostPopular
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private readonly HttpClient _httpClient;
     
-    private readonly AzureEncryptionService _azureEncryptionService;
+    private readonly HttpClient _httpClient;
+    private readonly SecretClient _secretClient;
+    private readonly IOptions<SteamOptions> _steamOptions;
 
     /// <summary>
-    /// 
-    /// </summary>
-    public StoreService()
-    {
-        _httpClient = new HttpClient();
-    }
-
-    /// <summary>
-    /// 
+    /// TODO: Add documentation.
     /// </summary>
     /// <param name="httpClientFactory"></param>
-    public StoreService(IHttpClientFactory httpClientFactory)
+    /// <param name="secretClient"></param>
+    /// <param name="steamOptions"></param>
+    public StoreService(IHttpClientFactory httpClientFactory, SecretClient secretClient, IOptions<SteamOptions> steamOptions)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
-        //_azureEncryptionService = azureEncryptionService;
+        _secretClient = secretClient;
+        _steamOptions = steamOptions;
     }
 
     /// <summary>
@@ -44,29 +34,13 @@ public class StoreService
     /// <param name="iAppReturnCountMax"></param>
     /// <param name="listSortBy"></param>
     /// <returns>List of App Id's for the given search</returns>
-    public async Task<List<SteamApp>> GetAppsFromStoreAsync(string? searchTerm, int iAppReturnCountMax = 10, List<SortBy>? listSortBy = null)
+    public async Task<string> GetAppsFromStoreAsync(string? searchTerm, int iAppReturnCountMax = 10, List<SortBy>? listSortBy = null)
     {
-        List<SteamApp> steamApps = new();
+        //List<SteamApp> steamApps = new();
 
-        /*HttpResponseMessage sResponse = await _httpClient
-            .GetAsync($"https://api.steampowered.com/ISteamApps/GetAppList/v2/?key={_azureEncryptionService.DecryptAsync(Convert.FromBase64String(steamSettings.Value.Token)).Result}");
-            */
-
-        //throw new Exception("Not yet implemented");
-        return steamApps;
-    }
-}
-
-public class AzureEncryptionService
-{
-    /// <summary>
-    /// Decryption using Azure.Security.KeyVault.Keys.Cryptography.CryptographyClient
-    /// </summary>
-    /// <param name="sEncryptedBytes">value to decrypt</param>
-    /// <returns>Task<string></returns>
-    public async Task<string> DecryptAsync(byte[] sEncryptedBytes)
-    {
+        HttpResponseMessage sResponse = await _httpClient
+            .GetAsync($"https://api.steampowered.com/ISteamApps/GetAppList/v2/?key={_secretClient.GetSecretAsync(_steamOptions.Value.Token)}");
+        
         return "Not yet implemented";
     }
-
 }
