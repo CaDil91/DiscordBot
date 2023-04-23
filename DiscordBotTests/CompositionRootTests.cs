@@ -1,21 +1,11 @@
-﻿using Castle.Core.Configuration;
-using DiscordBot.DiscordBot;
+﻿using DiscordBot.DiscordBot.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Xunit.Abstractions;
 
 namespace DiscordBot;
 
 public class CompositionRootTests
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public CompositionRootTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     [Fact]
     public void ComposeApplication_ReturnsServices()
     {
@@ -48,10 +38,9 @@ public class CompositionRootTests
     public void ComposeApplication_AddsSteamHttpClient()
     {
         // Arrange.
-        IServiceCollection services = new ServiceCollection();
+        IServiceProvider serviceProvider = new ServiceCollection().ComposeApplication().BuildServiceProvider();
         
         // Act.
-        IServiceProvider serviceProvider = new ServiceCollection().ComposeApplication().BuildServiceProvider();
         HttpClient steamHttpClient = serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("hardcodedsteam");
         
         // Assert.

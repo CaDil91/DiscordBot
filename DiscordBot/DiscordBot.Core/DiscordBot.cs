@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
 
-namespace DiscordBot.DiscordBot;
+namespace DiscordBot.DiscordBot.Core;
 
 public class DiscordBot
 {

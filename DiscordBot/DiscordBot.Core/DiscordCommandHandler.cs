@@ -3,7 +3,7 @@ using DiscordBot.DiscordBot.Commands;
 using Microsoft.Extensions.Logging;
 using SteamServices;
 
-namespace DiscordBot.DiscordBot;
+namespace DiscordBot.DiscordBot.Core;
 
 public class DiscordCommandHandler : IDiscordCommandHandler
 {

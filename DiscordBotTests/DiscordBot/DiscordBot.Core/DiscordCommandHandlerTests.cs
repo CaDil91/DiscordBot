@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DiscordBot.DiscordBot.Core;
+using Microsoft.Extensions.Logging;
 using Moq;
 using SteamServices;
 
-namespace DiscordBot.DiscordBot;
+namespace DiscordBot.DiscordBot.DiscordBot.Core;
 
 public class DiscordCommandHandlerTests
 {

@@ -6,6 +6,6 @@ using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) => { services.ComposeApplication(); })
     .Build();
 
-var discordBot = host.Services.GetRequiredService<DiscordBot.DiscordBot.DiscordBot>();
+var discordBot = host.Services.GetRequiredService<DiscordBot.DiscordBot.Core.DiscordBot>();
 
 await discordBot.RunAsync();

@@ -1,10 +1,8 @@
-﻿using Discord.WebSocket;
-using Microsoft.Extensions.Logging;
+﻿using DiscordBot.DiscordBot.Core;
 using Microsoft.Extensions.Options;
 using Moq;
-using SteamServices;
 
-namespace DiscordBot.DiscordBot;
+namespace DiscordBot.DiscordBot.DiscordBot.Core;
 
 public class DiscordBotTests
 {
@@ -12,14 +10,14 @@ public class DiscordBotTests
     private readonly Mock<IDiscordCommandHandler> _discordCommandHandler;
     private const string TEST_TOKEN = "MTAwMzA3NTcxMzAwNTUzMTIxNg.GsL_2g.7DxQHrpK31n1Bz6OxRYyMjl3xQD6U9Vvbowbuo";
 
-    private DiscordBot _subjectUnderTest;
+    private global::DiscordBot.DiscordBot.Core.DiscordBot _subjectUnderTest;
 
     public DiscordBotTests()
     {
         _discordCommandHandler = new Mock<IDiscordCommandHandler>();
         _optionsMock = new Mock<IOptions<DiscordBotOptions>>();
         
-        _subjectUnderTest = new DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
+        _subjectUnderTest = new global::DiscordBot.DiscordBot.Core.DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
     }
 
     [Fact]
@@ -31,7 +29,7 @@ public class DiscordBotTests
             DiscordToken = TEST_TOKEN
         };
         _optionsMock.Setup(x => x.Value).Returns(discordBotOptions);
-        _subjectUnderTest = new DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
+        _subjectUnderTest = new global::DiscordBot.DiscordBot.Core.DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
 
         //Act.
         _ = _subjectUnderTest.RunAsync();
