@@ -12,7 +12,8 @@ public class DiscordBot
 
     public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordCommandHandler discordCommandHandler)
     {
-        //When working with events that have Cacheable<IMessage, ulong> parameters, you must enable the message cache in your config settings if you plan to use the cached message entity.
+        //When working with events that have Cacheable<IMessage, ulong> parameters,
+        //you must enable the message cache in your config settings if you plan to use the cached message entity.
         var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         _client = new DiscordSocketClient(discordSocketConfig);
         _discordOptions = discordOptions;

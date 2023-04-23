@@ -1,4 +1,5 @@
 ﻿using Azure.Security.KeyVault.Secrets;
+using AzureServices;
 using Microsoft.Extensions.Options;
 
 namespace SteamServices;
@@ -12,19 +13,23 @@ public class StoreService
     
     private readonly HttpClient _httpClient;
     private readonly SecretClient _secretClient;
-    private readonly IOptions<SteamOptions> _steamOptions;
+    private readonly IOptions<AzureOptions> _azureOptions;
+
+    public StoreService()
+    {
+    }
 
     /// <summary>
     /// TODO: Add documentation.
     /// </summary>
     /// <param name="httpClientFactory"></param>
     /// <param name="secretClient"></param>
-    /// <param name="steamOptions"></param>
-    public StoreService(IHttpClientFactory httpClientFactory, SecretClient secretClient, IOptions<SteamOptions> steamOptions)
+    /// <param name="azureOptions"></param>
+    public StoreService(IHttpClientFactory httpClientFactory, SecretClient secretClient, IOptions<AzureOptions> azureOptions)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
         _secretClient = secretClient;
-        _steamOptions = steamOptions;
+        _azureOptions = azureOptions;
     }
 
     /// <summary>
@@ -39,7 +44,7 @@ public class StoreService
         //List<SteamApp> steamApps = new();
 
         HttpResponseMessage sResponse = await _httpClient
-            .GetAsync($"https://api.steampowered.com/ISteamApps/GetAppList/v2/?key={_secretClient.GetSecretAsync(_steamOptions.Value.Token)}");
+            .GetAsync($"https://api.steampowered.com/ISteamApps/GetAppList/v2/?key={_secretClient.GetSecretAsync(_azureOptions.Value.SteamSecret)}");
         
         return "Not yet implemented";
     }
