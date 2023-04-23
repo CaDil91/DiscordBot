@@ -23,22 +23,34 @@ public class SlashCommand : ICommand
         set => _data = value;
     }
 
+    public string ResponseMessage { get; set; } = "";
+
+    public SlashCommand()
+    {
+    }
+
     /// <summary>
     /// Default construction. Creates invalid command.
     /// </summary>
-    public SlashCommand()
+    /// <param name="socketSlashCommand"></param>
+    public SlashCommand(SocketSlashCommand socketSlashCommand)
     {
-        WrappedSocketSlashCommand = null;
-    }
-
-    public SlashCommand(SocketSlashCommand slashCommand)
-    {
-        WrappedSocketSlashCommand = slashCommand;
+        WrappedSocketSlashCommand = socketSlashCommand;
     }
 
     public async Task RespondAsync(string sResponseMessage)
     {
-        //if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.RespondAsync(sResponseMessage);
+        if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.RespondAsync(sResponseMessage);
+    }
+    
+    public async Task DeferAsync()
+    {
+        if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.DeferAsync();
+    }
+    
+    public async Task FollowupAsync()
+    {
+        if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.FollowupAsync(ResponseMessage);
     }
 
     public override string ToString()
@@ -49,16 +61,8 @@ public class SlashCommand : ICommand
             .ToString();
     }
 
-    /// <summary>
-    /// After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message
-    /// immediately using RespondAsync() or you can choose to send a deferred response with DeferAsync(). If choosing a
-    /// deferred response, the user will see a loading state for the interaction, and you'll have up to 15 minutes to
-    /// edit the original deferred response using ModifyOriginalResponseAsync(). You can read more about response types here.
-    /// https://discord.com/developers/docs/interactions/slash-commands#interaction-response
-    /// </summary>
-    public async Task ExecuteCommand()
+    public bool ValidateCommand()
     {
-        
-        await Task.CompletedTask;
+        return true;
     }
 }
