@@ -1,4 +1,7 @@
-﻿using Moq;
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Options;
+using Moq;
 using Moq.Protected;
 using SteamServices;
 
@@ -6,12 +9,21 @@ namespace DiscordBot;
 
 public class SteamServicesStoreServiceTests
 {
-    private readonly Mock<IHttpClientFactory> _mockHttpClientFactory = new();
+    private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
+    private readonly Mock<IOptions<SteamOptions>> _azureOptionsMock;
+
     private readonly StoreService _subjectUnderTest;
 
     public SteamServicesStoreServiceTests()
     {
-        //Create http client factory mock, and "hardcodedsteam"
+        // Create mocks
+        _azureOptionsMock = new Mock<IOptions<SteamOptions>>();
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+
+        // Create steam options mock, and Token.
+        _azureOptionsMock.Setup(x => x.Value.Token).Returns("token");
+
+        // Create http client factory mock, and "hardcodedsteam".
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var result = new HttpResponseMessage();
         handlerMock
@@ -25,9 +37,10 @@ public class SteamServicesStoreServiceTests
         {
             BaseAddress = new Uri("https://store.steampowered.com")
         };
-        _mockHttpClientFactory.Setup(_ => _.CreateClient("hardcodedsteam")).Returns(httpClient);
+        _httpClientFactoryMock.Setup(_ => _.CreateClient("hardcodedsteam")).Returns(httpClient);
 
-        _subjectUnderTest = new StoreService(_mockHttpClientFactory.Object);
+        // Create subject under test.
+        _subjectUnderTest = new StoreService(_httpClientFactoryMock.Object, new SecretClient(new Uri(""), new DefaultAzureCredential()), _azureOptionsMock.Object);
     }
 
     [Fact]
@@ -35,7 +48,7 @@ public class SteamServicesStoreServiceTests
     {
         //Arrange.
         //Act.
-        List<SteamApp> steamApps = await _subjectUnderTest.GetAppsFromStoreAsync("halo");
+        string steamApps = await _subjectUnderTest.GetAppsFromStoreAsync("halo");
 
         //Assert.
         Assert.NotNull(steamApps);

@@ -1,17 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using SteamServices;
 
 namespace DiscordBot.DiscordBot;
 
 public class DiscordCommandHandlerTests
 {
     private readonly Mock<ILogger<DiscordCommandHandler>> _loggerMock = new();
+    private readonly Mock<StoreService> _storeService = new();
 
     private readonly DiscordCommandHandler _subjectUnderTest;
 
     public DiscordCommandHandlerTests()
     {
-        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object);
+        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object, _storeService.Object);
     }
 
     [Fact]

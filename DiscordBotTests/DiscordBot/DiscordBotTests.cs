@@ -9,19 +9,17 @@ namespace DiscordBot.DiscordBot;
 public class DiscordBotTests
 {
     private readonly Mock<IOptions<DiscordBotOptions>> _optionsMock;
-    private readonly Mock<StoreService> _steamServiceMock;
     private readonly Mock<IDiscordCommandHandler> _discordCommandHandler;
     private const string TEST_TOKEN = "MTAwMzA3NTcxMzAwNTUzMTIxNg.GsL_2g.7DxQHrpK31n1Bz6OxRYyMjl3xQD6U9Vvbowbuo";
 
-    private global::DiscordBot.DiscordBot.DiscordBot _subjectUnderTest;
+    private DiscordBot _subjectUnderTest;
 
     public DiscordBotTests()
     {
         _discordCommandHandler = new Mock<IDiscordCommandHandler>();
-        _steamServiceMock = new Mock<StoreService>();
         _optionsMock = new Mock<IOptions<DiscordBotOptions>>();
         
-        _subjectUnderTest = new global::DiscordBot.DiscordBot.DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
+        _subjectUnderTest = new DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
     }
 
     [Fact]
@@ -33,7 +31,7 @@ public class DiscordBotTests
             DiscordToken = TEST_TOKEN
         };
         _optionsMock.Setup(x => x.Value).Returns(discordBotOptions);
-        _subjectUnderTest = new global::DiscordBot.DiscordBot.DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
+        _subjectUnderTest = new DiscordBot(_optionsMock.Object, _discordCommandHandler.Object);
 
         //Act.
         _ = _subjectUnderTest.RunAsync();
@@ -54,8 +52,8 @@ public class DiscordBotTests
     {
         // Arrange.
         _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
-        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object);
-        global::DiscordBot.DiscordBot.DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
+        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object, new Mock<StoreService>().Object);
+        DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
 
         var socketGuildMock = new Mock<SocketGuild>();
 
@@ -72,8 +70,8 @@ public class DiscordBotTests
     {
         //Arrange.
         _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
-        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object);
-        global::DiscordBot.DiscordBot.DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
+        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object, new Mock<StoreService>().Object);
+        DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
 
         //Act and Assert.
         var exception = await Assert.ThrowsAsync<Exception>(() => discordBot.RegisterSlashCommands("invalid", null, "invalid"));
