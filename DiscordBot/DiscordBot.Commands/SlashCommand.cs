@@ -61,6 +61,10 @@ public class SlashCommand : ICommand
             .ToString();
     }
 
+    /// <summary>
+    /// TODO: 
+    /// </summary>
+    /// <returns></returns>
     public bool ValidateCommand()
     {
         return true;

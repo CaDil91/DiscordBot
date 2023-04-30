@@ -31,13 +31,19 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 
         var slashCommand = new SlashCommand(socketSlashCommand);
         await slashCommand.DeferAsync();
-        if (slashCommand.ValidateCommand()) await RunSlashCommandAsync(slashCommand);
+        if (!slashCommand.ValidateCommand()) return;
+        await RunSlashCommandAsync(slashCommand);
         await slashCommand.FollowupAsync();
     }
 
+    /// <summary>
+    /// TODO: Add documentation.
+    /// </summary>
+    /// <param name="slashCommand"></param>
     private async Task RunSlashCommandAsync(SlashCommand slashCommand)
     {
-        slashCommand.ResponseMessage = await _steamService.GetAppsFromStoreAsync("halo");
+        List<SteamApp> steamApps = await _steamService.GetAppsFromStoreAsync("halo");
+        // TODO: Return results to user.
         await Task.CompletedTask;
     }
 }
