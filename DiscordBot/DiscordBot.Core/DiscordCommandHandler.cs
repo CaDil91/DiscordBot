@@ -8,9 +8,9 @@ namespace DiscordBot.DiscordBot.Core;
 public class DiscordCommandHandler : IDiscordCommandHandler
 {
     private readonly ILogger<DiscordCommandHandler> _logger;
-    private readonly StoreService _steamService;
+    private readonly IStoreService _steamService;
 
-    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, StoreService steamService)
+    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService)
     {
         _logger = logger;
         _steamService = steamService;
@@ -42,7 +42,7 @@ public class DiscordCommandHandler : IDiscordCommandHandler
     /// <param name="slashCommand"></param>
     private async Task RunSlashCommandAsync(SlashCommand slashCommand)
     {
-        List<SteamApp> steamApps = await _steamService.GetAppsFromStoreAsync("halo");
+        List<SteamApp> steamApps = await _steamService.GetAppsAsync("halo");
         // TODO: Return results to user.
         await Task.CompletedTask;
     }

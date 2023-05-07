@@ -14,9 +14,9 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        services.AddHttpClient("hardcodedsteam", client => { client.BaseAddress = new Uri("https://store.steampowered.com"); });
+        services.AddHttpClient("hardcodedsteam", client => { client.BaseAddress = new Uri("https://api.steampowered.com"); });
         services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
-        services.AddSingleton<DiscordBot.Core.DiscordBot>();
+        services.AddSingleton<IDiscordBot, DiscordBot.Core.DiscordBot>();
         services.AddLogging(x => x.AddConsole());
 
         services.AddOptions<DiscordBotOptions>()

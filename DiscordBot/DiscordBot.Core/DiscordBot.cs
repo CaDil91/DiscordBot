@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace DiscordBot.DiscordBot.Core;
 
-public class DiscordBot
+public class DiscordBot : IDiscordBot
 {
     private readonly DiscordSocketClient _client;
     private readonly IDiscordCommandHandler _discordCommandHandler;
