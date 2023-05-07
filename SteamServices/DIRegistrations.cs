@@ -12,7 +12,8 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterSteamServices(this IServiceCollection services)
     {
-        services.AddTransient<StoreService>();
+        services.AddSingleton<IAppRepository, SteamAppRepository>();
+        services.AddSingleton<IStoreService, StoreService>();
         services.AddOptions<SteamOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {
