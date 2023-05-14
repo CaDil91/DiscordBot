@@ -24,6 +24,20 @@ public class DIRegistrationTests
         
         _host = hostBuilder.Build();
     }
+    
+    [Fact]
+    public void RegisterSteamServices_AddsHttpClient()
+    {
+        // Arrange.
+        
+        // Act. Get the named HttpClient.
+        HttpClient httpClient = _host.Services.GetRequiredService<IHttpClientFactory>().CreateClient("hardcodedsteam");
+        
+        // Assert.
+        Assert.NotNull(httpClient);
+        Assert.Contains("api.steampowered.com", httpClient.BaseAddress?.ToString());
+
+    }
 
     // Test that StoreService is registered.
     [Fact]
