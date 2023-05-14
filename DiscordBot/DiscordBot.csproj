@@ -37,6 +37,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AzureServices\AzureServices.csproj" />
+        <ProjectReference Include="..\GoogleServices\GoogleServices.csproj" />
         <ProjectReference Include="..\SteamServices\SteamServices.csproj" />
     </ItemGroup>
 

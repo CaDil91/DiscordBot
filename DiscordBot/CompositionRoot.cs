@@ -1,4 +1,5 @@
 ﻿using AzureServices;
+using GoogleService;
 using Microsoft.Extensions.DependencyInjection;
 using SteamServices;
 
@@ -11,6 +12,7 @@ public static class CompositionRoot
         services.RegisterDiscordBot();
         services.RegisterSteamServices();
         services.RegisterAzureServices();
+        services.RegisterGoogleServices();
         
         return services;
     }
