@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GoogleService;
+using Microsoft.Extensions.Logging;
 using Moq;
 using SteamServices;
 
@@ -16,10 +17,11 @@ public class SteamAppRepositoryTests
         {
             BaseAddress = new Uri("https://api.steampowered.com")
         });
-        
         Mock<ILogger<SteamAppRepository>> loggerMock = new();
+        Mock<IGoogleSearchRepository> googleSearchRepository = new();
         
-        _subjectUnderTest = new SteamAppRepository(httpClientFactoryMock.Object, loggerMock.Object);
+        
+        _subjectUnderTest = new SteamAppRepository(httpClientFactoryMock.Object, loggerMock.Object, googleSearchRepository.Object);
     }
     
     [Fact]

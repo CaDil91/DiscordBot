@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AzureServices\AzureServices.csproj" />
+      <ProjectReference Include="..\GoogleServices\GoogleServices.csproj" />
     </ItemGroup>
 
 </Project>

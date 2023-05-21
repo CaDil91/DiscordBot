@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Azure;
 using Azure.Security.KeyVault.Secrets;
 using GoogleService;
 using Microsoft.Extensions.Logging;
@@ -142,20 +143,39 @@ public class SteamStoreRepositoryTests
         Assert.NotEmpty(customSearchResults);
         Assert.Equal("https://www.halowaypoint.com/en-us/games/halo-5-guardians", customSearchResults[0]);
     }
+    
+    [Fact]
+    public async Task GetCustomSearchResultsAsync_LogsWarning_OnUnsuccessfulHttpCall()
+    {
+        // Arrange.
+        _httpResponseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
 
-    /*
+        // Act.
+        List<string> customSearchResults = await _subjectUnderTest.GetCustomSearchResultsAsync("halo");
+
+        // Assert.
+        Assert.Empty(customSearchResults);
+        _loggerMock.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to get results from google.")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
+    }
+
     [Fact]
     public async Task SetKeyAsync_ReturnsFalseOnFailure()
     {
-        // Arrange. TODO: mock in constructor.
+        // Arrange.
         _secretClientMock.Setup(x => x.SetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Throws(new Exception("Any Exception"));
         
-        _subjectUnderTest = new SteamStoreRepository(_googleOptionsMock.Object, _httpClientFactoryMock.Object, 
+        var subjectUnderTest = new SteamStoreRepository(_googleOptionsMock.Object, new Mock<IHttpClientFactory>().Object, 
             _secretClientMock.Object, _loggerMock.Object);
 
         // Act.
-        bool result = await _subjectUnderTest.SetKeyAsync("INVALID ARGUMENT");
+        bool result = await subjectUnderTest.SetKeyAsync("Any value");
 
         // Assert.
         Assert.False(result);
@@ -166,5 +186,80 @@ public class SteamStoreRepositoryTests
                 It.Is<It.IsAnyType>((v, t) => v.ToString() == "Failed to get secret from vault."),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
-    }*/
+    }
+    
+    [Fact]
+    public async Task SetKeyAsync_ReturnsTrueOnSuccess()
+    {
+        // Arrange.
+        var secretClientMock = new Mock<SecretClient>();
+        var keyVaultSecretResponseMock = new Mock<Response<KeyVaultSecret>>();
+        keyVaultSecretResponseMock.Setup(x => x.Value).Returns(new KeyVaultSecret("name", "value"));
+        secretClientMock
+            .Setup(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => keyVaultSecretResponseMock.Object);
+                
+        var subjectUnderTest = new SteamStoreRepository(_googleOptionsMock.Object, new Mock<IHttpClientFactory>().Object, 
+            secretClientMock.Object, _loggerMock.Object);
+
+        // Act.
+        bool result = await subjectUnderTest.SetKeyAsync("Any value");
+
+        // Assert.
+        Assert.True(result);
+    }
+    
+    [Fact]
+    public async Task GetLinksFromResponseAsync_ReturnsEmptyList_WhenResponseIsNotSuccessful()
+    {
+        // Arrange
+        var response = new HttpResponseMessage(HttpStatusCode.NotFound);
+
+        // Act
+        List<string> result = await _subjectUnderTest.GetLinksFromResponseAsync(response);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetLinksFromResponseAsync_ReturnsEmptyList_WhenResponseIsNotValidJson()
+    {
+        // Arrange
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("Invalid JSON")
+        };
+
+        // Act
+        List<string> result = await _subjectUnderTest.GetLinksFromResponseAsync(response);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetLinksFromResponseAsync_ReturnsValidLinks_WhenResponseIsValidJson()
+    {
+        // Arrange
+        const string jsonContent = @"{
+            ""items"": [
+                { ""link"": ""http://example.com/1"" },
+                { ""link"": ""http://example.com/2"" }
+            ]
+        }";
+
+        var response = new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(jsonContent)
+        };
+
+        // Act
+        List<string> result = await _subjectUnderTest.GetLinksFromResponseAsync(response);
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Contains("http://example.com/1", result);
+        Assert.Contains("http://example.com/2", result);
+    }
 }
