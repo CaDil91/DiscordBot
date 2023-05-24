@@ -20,7 +20,7 @@ public static class DIRegistrations
         services.AddAzureClients(builder =>
         {
             builder.UseCredential(new DefaultAzureCredential());
-            builder.AddSecretClient(new Uri("https://discordbot.vault.azure.net/"));
+            builder.AddSecretClient(new Uri("https://justabotvault.vault.azure.net/"));
         });
         return services;
     }
