@@ -12,6 +12,7 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterSteamServices(this IServiceCollection services)
     {
+        services.AddHttpClient("hardcodedsteam", client => { client.BaseAddress = new Uri("https://api.steampowered.com"); });
         services.AddSingleton<IAppRepository, SteamAppRepository>();
         services.AddSingleton<IStoreService, StoreService>();
         services.AddOptions<SteamOptions>()
