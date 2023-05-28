@@ -15,7 +15,7 @@ public static class DIRegistrations
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
         services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
-        services.AddSingleton<IDiscordBot, DiscordBot.Core.DiscordBot>();
+        services.AddSingleton<DiscordBot.Core.DiscordBot>();
         services.AddLogging(x => x.AddConsole());
 
         services.AddOptions<DiscordBotOptions>()
