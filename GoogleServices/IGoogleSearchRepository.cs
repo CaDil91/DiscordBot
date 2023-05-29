@@ -2,5 +2,5 @@
 
 public interface IGoogleSearchRepository
 {
-    public Task<List<string>> GetCustomSearchResultsAsync(string sQuery, int iCount = 10);
+    public Task<List<Uri>> GetCustomSearchResultsAsync(string sQuery, int iCount = 10);
 }
