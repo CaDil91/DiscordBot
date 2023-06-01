@@ -50,7 +50,7 @@ public class DiscordBotTests
     {
         // Arrange.
         _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
-        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object, new Mock<StoreService>().Object);
+        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object, new Mock<SteamStoreService>().Object);
         DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
 
         var socketGuildMock = new Mock<SocketGuild>();
@@ -68,7 +68,7 @@ public class DiscordBotTests
     {
         //Arrange.
         _optionsMock.Setup(x => x.Value).Returns(new DiscordBotOptions());
-        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object, new Mock<StoreService>().Object);
+        var discordCommandHandler = new DiscordCommandHandler(new Mock<ILogger<DiscordCommandHandler>>().Object, new Mock<SteamStoreService>().Object);
         DiscordBot discordBot = new(_optionsMock.Object, discordCommandHandler);
 
         //Act and Assert.
