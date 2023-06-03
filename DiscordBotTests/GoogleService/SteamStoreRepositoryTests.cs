@@ -13,16 +13,17 @@ public class SteamStoreRepositoryTests
 {
     private const string CUSTOM_SEARCH_GOOGLEAPIS_URL = "https://content-customsearch.googleapis.com/customsearch/v1";
     
-    private readonly Mock<ILogger<SteamStoreRepository>> _loggerMock;
+    private readonly Mock<ILogger<GoogleCustomSearchService>> _loggerMock;
     private readonly Mock<IOptions<GoogleOptions>> _googleOptionsMock;
-    private readonly Mock<SecretClient> _secretClientMock;
-    
-    private HttpResponseMessage _httpResponseMessage = new(HttpStatusCode.OK)
+    private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
+    private readonly Mock<Response<KeyVaultSecret>> _keyVaultSecretResponseMock;
+
+    private HttpResponseMessage _mockedHttpClientsResponseMessage = new(HttpStatusCode.OK)
     {
         Content = new StringContent("Default response content.")
     };
-    
-    private readonly SteamStoreRepository _subjectUnderTest;
+
+    private GoogleCustomSearchService? _subjectUnderTest;
 
     public SteamStoreRepositoryTests()
     {
@@ -30,7 +31,7 @@ public class SteamStoreRepositoryTests
         _googleOptionsMock = new Mock<IOptions<GoogleOptions>>();
         _googleOptionsMock.SetupGet(_ => _.Value).Returns(new GoogleOptions()
         {
-            Token = "Google",
+            Key = "Google",
             SteamStoreCx = "3533c3e3e23024252"
         });
 
@@ -38,56 +39,76 @@ public class SteamStoreRepositoryTests
         var httpMessageHandlerMock = new Mock<HttpMessageHandler>();
         httpMessageHandlerMock
             .Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(() => _httpResponseMessage);
-        
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() => _mockedHttpClientsResponseMessage);
+
         var httpClient = new HttpClient(httpMessageHandlerMock.Object)
         {
             BaseAddress = new Uri(CUSTOM_SEARCH_GOOGLEAPIS_URL)
         };
-        
-        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        httpClientFactoryMock
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        _httpClientFactoryMock
             .Setup(_ => _.CreateClient(It.IsAny<string>()))
             .Returns(httpClient);
 
-        // Setup _secretClientMock.
-        _secretClientMock = new Mock<SecretClient>();
-
         // Setup _loggerMock.
-        _loggerMock = new Mock<ILogger<SteamStoreRepository>>();
+        _loggerMock = new Mock<ILogger<GoogleCustomSearchService>>();
 
+        // TODO: Testing a singleton.
+        _subjectUnderTest = null;
+        // if (_key == null) SetKeyAsync(googleOptions.Value.Key).Wait();
+        // What if I want to test this? As soon as it's set, _subjectUnderTest isn't viable for that test anymore.
         // Setup _subjectUnderTest.
-        _subjectUnderTest = new SteamStoreRepository(_googleOptionsMock.Object, httpClientFactoryMock.Object,
-            _secretClientMock.Object, _loggerMock.Object);
+        _subjectUnderTest = new GoogleCustomSearchService(_googleOptionsMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object);
     }
 
     [Fact]
-    public async Task GetCustomSearchResultsAsync_LogsError_OnHttpError()
+    public void Construction_Throws_WhenRequestToClientFails()
+    {
+        // Arrange.
+        var secretClientMock = new Mock<SecretClient>();
+        secretClientMock
+            .Setup(_ => _.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Any exception."));
+
+        // Act.
+        // Assert.
+        Assert.Throws<Exception>(() => new GoogleCustomSearchService(_googleOptionsMock.Object, _httpClientFactoryMock.Object, _loggerMock.Object));
+        
+        _loggerMock.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString() == "Request to key vault failed."),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
+    }
+
+    [Fact]
+    public async Task GetCustomSearchResultsAsync_LogsError_OnHttpRequestException()
     {
         // Arrange.
         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         httpMessageHandlerMock
             .Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-            .ThrowsAsync(new Exception("Failed to send http request."))
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ThrowsAsync(new Exception("Unexpected exception."))
             .Verifiable();
-        
         var httpClient = new HttpClient(httpMessageHandlerMock.Object)
         {
             BaseAddress = new Uri(CUSTOM_SEARCH_GOOGLEAPIS_URL)
         };
-        
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var steamStoreRepository = new SteamStoreRepository(_googleOptionsMock.Object, httpClientFactoryMock.Object,
-            _secretClientMock.Object, _loggerMock.Object);
+        var steamStoreRepository = new GoogleCustomSearchService(_googleOptionsMock.Object,
+            httpClientFactoryMock.Object, _loggerMock.Object);
 
         // Act.
-        await steamStoreRepository.GetCustomSearchResultsAsync("query");
-
         // Assert.
+        await Assert.ThrowsAsync<Exception>(() => steamStoreRepository.GetCustomSearchResultsAsync("Any query."));
         _loggerMock.Verify(
             x => x.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
@@ -98,7 +119,7 @@ public class SteamStoreRepositoryTests
     }
 
     [Fact]
-    public async Task GetCustomSearchResultsAsync_ReturnsEmptyList_OnHttpError()
+    public async Task GetCustomSearchResultsAsync_LogsCritical_OnUnexpectedException()
     {
         // Arrange.
         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
@@ -106,160 +127,154 @@ public class SteamStoreRepositoryTests
             .Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>())
-            .ThrowsAsync(new Exception("Failed to send http request."))
+            .ThrowsAsync(new Exception("Unexpected exception."))
             .Verifiable();
-        
         var httpClient = new HttpClient(httpMessageHandlerMock.Object)
         {
             BaseAddress = new Uri(CUSTOM_SEARCH_GOOGLEAPIS_URL)
         };
-        
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var steamStoreRepository = new SteamStoreRepository(_googleOptionsMock.Object, httpClientFactoryMock.Object,
-            _secretClientMock.Object, _loggerMock.Object);
-        
-        // Act.
-        List<string> customSearchResults = await steamStoreRepository.GetCustomSearchResultsAsync("halo");
-
-        // Assert.
-        Assert.Empty(customSearchResults);
-    }
-
-    [Fact]
-    public async Task GetCustomSearchResultsAsync_ReturnsListOfResults()
-    {
-        // Arrange.
-        _httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent("{\"items\": [{\"link\": \"https://www.halowaypoint.com/en-us/games/halo-5-guardians\"}]}")
-        };
+        var steamStoreRepository = new GoogleCustomSearchService(_googleOptionsMock.Object,
+            httpClientFactoryMock.Object, _loggerMock.Object);
 
         // Act.
-        List<string> customSearchResults = await _subjectUnderTest.GetCustomSearchResultsAsync("halo");
-
         // Assert.
-        Assert.NotEmpty(customSearchResults);
-        Assert.Equal("https://www.halowaypoint.com/en-us/games/halo-5-guardians", customSearchResults[0]);
-    }
-    
-    [Fact]
-    public async Task GetCustomSearchResultsAsync_LogsWarning_OnUnsuccessfulHttpCall()
-    {
-        // Arrange.
-        _httpResponseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
-
-        // Act.
-        List<string> customSearchResults = await _subjectUnderTest.GetCustomSearchResultsAsync("halo");
-
-        // Assert.
-        Assert.Empty(customSearchResults);
+        await Assert.ThrowsAsync<Exception>(() => steamStoreRepository.GetCustomSearchResultsAsync("Any query."));
         _loggerMock.Verify(
             x => x.Log(
-                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Critical),
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to get results from google.")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString() == "Failed to send http request."),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
     }
 
     [Fact]
-    public async Task SetKeyAsync_ReturnsFalseOnFailure()
+    public async Task GetCustomSearchResultsAsync_LogsWarning_OnUnsuccessfulStatusCodeResponse()
     {
         // Arrange.
-        _secretClientMock.Setup(x => x.SetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Throws(new Exception("Any Exception"));
-        
-        var subjectUnderTest = new SteamStoreRepository(_googleOptionsMock.Object, new Mock<IHttpClientFactory>().Object, 
-            _secretClientMock.Object, _loggerMock.Object);
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.BadRequest;
 
         // Act.
-        bool result = await subjectUnderTest.SetKeyAsync("Any value");
+        await _subjectUnderTest?.GetCustomSearchResultsAsync("Any query.")!;
 
         // Assert.
-        Assert.False(result);
         _loggerMock.Verify(
             x => x.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString() == "Failed to get secret from vault."),
+                It.Is<It.IsAnyType>((v, t) => v.ToString() == "Request to Google Custom Search API failed."),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
     }
-    
+
     [Fact]
-    public async Task SetKeyAsync_ReturnsTrueOnSuccess()
+    public async Task GetCustomSearchResultsAsync_ReturnsEmptyList_OnUnsuccessfulStatusCodeResponse()
     {
         // Arrange.
-        var secretClientMock = new Mock<SecretClient>();
-        var keyVaultSecretResponseMock = new Mock<Response<KeyVaultSecret>>();
-        keyVaultSecretResponseMock.Setup(x => x.Value).Returns(new KeyVaultSecret("name", "value"));
-        secretClientMock
-            .Setup(x => x.GetSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => keyVaultSecretResponseMock.Object);
-                
-        var subjectUnderTest = new SteamStoreRepository(_googleOptionsMock.Object, new Mock<IHttpClientFactory>().Object, 
-            secretClientMock.Object, _loggerMock.Object);
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.BadRequest;
 
         // Act.
-        bool result = await subjectUnderTest.SetKeyAsync("Any value");
+        List<Uri> result = await _subjectUnderTest!.GetCustomSearchResultsAsync("Any query.").ConfigureAwait(false);
 
         // Assert.
-        Assert.True(result);
+        Assert.Empty(result);
     }
-    
+
     [Fact]
-    public async Task GetLinksFromResponseAsync_ReturnsEmptyList_WhenResponseIsNotSuccessful()
+    public async Task GetCustomSearchResultsAsync_ThrowsException_IfItemsCantBeRetrievedFromGoogleResult()
+    {
+        // Arrange.
+        var sContent = "Bad content.";
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.OK;
+        _mockedHttpClientsResponseMessage.Content = new StringContent(sContent);
+
+        // Act.
+        await Assert.ThrowsAsync<ArgumentException>(() => _subjectUnderTest!.GetCustomSearchResultsAsync("Any query."));
+        _loggerMock.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) =>
+                    v.ToString() == $"Failed to get items from google search. Response: {sContent}"),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
+    }
+
+    [Fact]
+    public async Task GetCustomSearchResultsAsync_ReturnsEmptyList_WhenResultContainsNoUris()
     {
         // Arrange
-        var response = new HttpResponseMessage(HttpStatusCode.NotFound);
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.OK;
+        _mockedHttpClientsResponseMessage.Content = new StringContent(@"{ ""items"": [] }");
 
         // Act
-        List<string> result = await _subjectUnderTest.GetLinksFromResponseAsync(response);
+        List<Uri> result = await _subjectUnderTest.GetCustomSearchResultsAsync("Any query.").ConfigureAwait(false);
 
         // Assert
         Assert.Empty(result);
     }
 
     [Fact]
-    public async Task GetLinksFromResponseAsync_ReturnsEmptyList_WhenResponseIsNotValidJson()
+    public async Task GetCustomSearchResultsAsync_ReturnsEmptyList_WhenResultContainsInvalidUris()
     {
         // Arrange
-        var response = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent("Invalid JSON")
-        };
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.OK;
+        _mockedHttpClientsResponseMessage.Content =
+            new StringContent(@"{ ""items"": [ { ""link"": ""Invalid uri"" } ] }");
 
         // Act
-        List<string> result = await _subjectUnderTest.GetLinksFromResponseAsync(response);
+        List<Uri> result = await _subjectUnderTest.GetCustomSearchResultsAsync("Any query.").ConfigureAwait(false);
 
         // Assert
         Assert.Empty(result);
     }
 
     [Fact]
-    public async Task GetLinksFromResponseAsync_ReturnsValidLinks_WhenResponseIsValidJson()
+    public async Task GetCustomSearchResultsAsync_ReturnsListOfRequestedSize_WhenResultsContainEnoughValidUris()
     {
         // Arrange
-        const string jsonContent = @"{
-            ""items"": [
-                { ""link"": ""http://example.com/1"" },
-                { ""link"": ""http://example.com/2"" }
-            ]
-        }";
-
-        var response = new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(jsonContent)
-        };
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.OK;
+        _mockedHttpClientsResponseMessage.Content = new StringContent(
+            @"{ ""items"": [ 
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" }            
+            ] }");
 
         // Act
-        List<string> result = await _subjectUnderTest.GetLinksFromResponseAsync(response);
+        List<Uri> result = await _subjectUnderTest.GetCustomSearchResultsAsync("Any query.", 5).ConfigureAwait(false);
 
         // Assert
-        Assert.Equal(2, result.Count);
-        Assert.Contains("http://example.com/1", result);
-        Assert.Contains("http://example.com/2", result);
+        Assert.Equal(5, result.Count);
+    }
+
+    [Fact]
+    public async Task GetCustomSearchResultsAsync_ReturnsAllItsResults_WhenResultsDoesntContainEnoughValidUris()
+    {
+        // Arrange.
+        _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.OK;
+        _mockedHttpClientsResponseMessage.Content = new StringContent(
+            @"{ ""items"": [ 
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },
+                { ""link"": ""https://example.com/1"" },         
+            ] }");
+        
+        
+        // Act.
+        List<Uri> result = await _subjectUnderTest.GetCustomSearchResultsAsync("Any query.", 5).ConfigureAwait(false);
+        
+        // Assert.
+        Assert.Equal(3, result.Count);
     }
 }

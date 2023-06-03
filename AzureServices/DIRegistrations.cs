@@ -16,12 +16,6 @@ public static class DIRegistrations
                 configuration.GetSection(AzureOptions.SECTION_NAME).Bind(options);
             });
         
-        // Add Azure services
-        services.AddAzureClients(builder =>
-        {
-            builder.UseCredential(new DefaultAzureCredential());
-            builder.AddSecretClient(new Uri("https://justabotvault.vault.azure.net/"));
-        });
         return services;
     }
 }

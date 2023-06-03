@@ -1,66 +1,31 @@
-﻿using Azure;
-using Azure.Security.KeyVault.Secrets;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace GoogleService;
 
-public class GoogleCustomSearchService : IGoogleSearchRepository
+public class GoogleCustomSearchService : IGoogleSearchRepository, IDisposable
 {
     private readonly ILogger<GoogleCustomSearchService> _logger;
     private readonly HttpClient _httpClient;
-    private readonly SecretClient _secretClient;
-    private readonly string _sDefaultParameters;
-    
-    private static string? _key;
-    private async Task<bool> SetKeyAsync(string sKeyName)
-    {
-        try
-        {
-            Response<KeyVaultSecret> secret = await _secretClient.GetSecretAsync(sKeyName).ConfigureAwait(false);
-            _key = secret.Value.Value;
-        }
-        catch (ArgumentException e)
-        {
-            _logger.LogError(e, "Key name is empty.");
-            throw;
-        }
-        catch (RequestFailedException e)
-        {
-            _logger.LogError(e, "Request to key vault failed. Key name: {KeyName}", sKeyName);
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogCritical(e, "Unexpected exception.");
-            throw;
-        }
-
-        return true;
-    }
+    private readonly string _cx;
+    private readonly string _googleApiKey;
 
     /// <summary>
     /// Constructor for the GoogleCustomSearchService class.
     /// </summary>
     /// <param name="googleOptions">Options for Google Custom Search.</param>
     /// <param name="httpClientFactory">Factory for creating HttpClient instances.</param>
-    /// <param name="secretClient">Client for accessing secrets.</param>
     /// <param name="logger">Logger for logging messages.</param>
     public GoogleCustomSearchService(IOptions<GoogleOptions> googleOptions, IHttpClientFactory httpClientFactory,
-        SecretClient secretClient, ILogger<GoogleCustomSearchService> logger)
+        ILogger<GoogleCustomSearchService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedgoogle");
         _logger = logger;
-        _secretClient = secretClient;
-        
-        // If the API key is null, retrieve it asynchronously from the googleOptions and set it.
-        if (_key == null) SetKeyAsync(googleOptions.Value.Token).Wait();
+        _cx = googleOptions.Value.SteamStoreCx;
+        _googleApiKey = googleOptions.Value.Key;
 
-        // Build the default query parameters using the retrieved API key and other options.
-        _sDefaultParameters = $"key={_key}" +
-                              $"&cx={googleOptions.Value.SteamStoreCx}" +
-                              "&lr=lang_en";
+        // Build the default query parameters using the retrieved API key and other options.;
     }
 
     /// <summary>
@@ -72,19 +37,23 @@ public class GoogleCustomSearchService : IGoogleSearchRepository
     public async Task<List<Uri>> GetCustomSearchResultsAsync(string sQuery, int iCount = 10)
     {
         // Send HTTP request to Google and get response.
-        var request = new HttpRequestMessage(HttpMethod.Get, new Uri($"{_httpClient.BaseAddress}?{_sDefaultParameters}&q={sQuery}"));
-        
         HttpResponseMessage response;
         try
         {
-            response = _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead).Result;
+            response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
+        }
+        catch (HttpRequestException e)   
+        {
+            _logger.LogError(e, "Request to Google Custom Search API failed.");
+            throw;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to send http request. {request}", request);
+            _logger.LogCritical(e, "Failed to send http request.");
             throw;
         }
         
+        // If the response is not successful, log a warning and return an empty list.
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogWarning("Failed to get results from google. Status code: {StatusCode}. Reason: {Reason}. Request message: {RequestMessage}", 
@@ -94,7 +63,11 @@ public class GoogleCustomSearchService : IGoogleSearchRepository
 
         // Deserialize the response.
         var googleResult = JsonConvert.DeserializeObject<GoogleResult>(await response.Content.ReadAsStringAsync());
-        if (googleResult is not { Items: { } }) throw new Exception($"Failed to deserialize successfully retrieved google search. Response: {response}");
+        if (googleResult is not { Items: { } })
+        {
+            _logger.LogError("Failed to get items from google search. Response: {Response}", response.Content);
+            throw new ArgumentException("Failed to get items from google search.");
+        }
 
         // Get the first iCount results.
         List<Uri> uriList = GetUriList(googleResult.Items, iCount);
@@ -135,6 +108,12 @@ public class GoogleCustomSearchService : IGoogleSearchRepository
             [JsonProperty("link")]
             public string Link { get; set; } = "";
         }
+    }
+
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 

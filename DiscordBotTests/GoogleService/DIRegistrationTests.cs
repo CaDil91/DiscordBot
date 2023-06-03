@@ -2,6 +2,7 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using GoogleService;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -17,8 +18,9 @@ public class DIRegistrationTests
     {
         _subjectUnderTest = new ServiceCollection();
 
-        // Create _host.
+        // Create _host, and Act.
         IHostBuilder hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((_, configuration) => configuration.AddEnvironmentVariables())
             .ConfigureServices((_, services) =>
             {
                 services.RegisterGoogleServices();
@@ -42,35 +44,36 @@ public class DIRegistrationTests
 
     }
     
-    // Test that SteamStoreRepository is registered.
     [Fact]
     public void RegisterGoogleServices_AddsStoreService()
     {
         // Arrange.
-        
         // Act.
-
         // Assert.
         Assert.Contains(_subjectUnderTest, serviceDescriptor => serviceDescriptor.ServiceType == typeof(IGoogleSearchRepository));
     }
     
-    // Test that SteamOptions is registered.
     [Fact]
     public async Task RegisterGoogleServices_AddsGoogleOptions()
     {
         // Arrange.
-        var secretClient = new SecretClient(new Uri("https://justabotvault.vault.azure.net/"), new DefaultAzureCredential());
         var googleOptions = _host.Services.GetRequiredService<IOptions<GoogleOptions>>();
         
         // Act.
-        Response<KeyVaultSecret>? test = await secretClient.GetSecretAsync(googleOptions.Value.Token);
-        
-
         // Assert.
         Assert.NotNull(googleOptions);
-        Assert.Equal("Google", googleOptions.Value.Token);
-        Assert.Equal("3533c3e3e23024252", googleOptions.Value.SteamStoreCx);
-        Assert.True(test.HasValue);
+        Assert.NotNull(googleOptions.Value.Key);
+        Assert.NotNull(googleOptions.Value.SteamStoreCx);
+    }
+    
+    [Fact]
+    public void RegisterGoogleServices_AddsGoogleOptions_LoadsKeyFromConfigurationManagerAppSettings()
+    {
+        // Arrange.
+
+        // Act.
+
+        // Assert.
     }
     
 }
