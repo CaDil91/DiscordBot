@@ -1,25 +1,18 @@
-﻿using Moq;
+﻿using GoogleService;
+using Microsoft.Extensions.Logging;
+using Moq;
 using SteamServices;
 
 namespace DiscordBot.SteamServices;
 
 public class SteamServicesStoreServiceTests
 {
-    private readonly StoreService _subjectUnderTest;
+    private readonly SteamStoreService _subjectUnderTest;
 
     public SteamServicesStoreServiceTests()
     {
-        // Create mocks
-        Mock<IAppRepository> appRepositoryMock = new();
-        appRepositoryMock.Setup(x => x.GetAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(new List<SteamApp>()
-        {
-            new() { AppId = 1, Name = "App 1" },
-            new() { AppId = 2, Name = "App 2" },
-            new() { AppId = 3, Name = "App 3" }
-        });
-
         // Create subject under test.
-        _subjectUnderTest = new StoreService(appRepositoryMock.Object);
+        _subjectUnderTest = new SteamStoreService(new Mock<IHttpClientFactory>().Object, new Mock<ILogger<SteamStoreService>>().Object, new Mock<IGoogleSearchRepository>().Object);
     }
     /// <summary>
     /// GetAppsAsync() test.

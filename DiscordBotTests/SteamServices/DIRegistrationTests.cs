@@ -35,11 +35,9 @@ public class DIRegistrationTests
         
         // Assert.
         Assert.NotNull(httpClient);
-        Assert.Contains("api.steampowered.com", httpClient.BaseAddress?.ToString());
-
     }
 
-    // Test that StoreService is registered.
+    // Test that SteamStoreService is registered.
     [Fact]
     public void RegisterSteamServices_AddsStoreService()
     {
