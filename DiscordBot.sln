@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBotTests", "DiscordB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamServices", "SteamServices\SteamServices.csproj", "{0F48CC20-3912-4C12-9A03-9DE975518913}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTester", "MyTester\MyTester.csproj", "{23E1D262-0255-4EDA-AC83-76F55897E0B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureServices", "AzureServices\AzureServices.csproj", "{9BCDC0F1-D5F6-4971-8CA8-72D0E78EB8A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleServices", "GoogleServices\GoogleServices.csproj", "{195DBA74-037F-491E-937D-7ED2BD3A43E0}"
@@ -30,10 +28,6 @@ Global
 		{0F48CC20-3912-4C12-9A03-9DE975518913}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F48CC20-3912-4C12-9A03-9DE975518913}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F48CC20-3912-4C12-9A03-9DE975518913}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23E1D262-0255-4EDA-AC83-76F55897E0B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23E1D262-0255-4EDA-AC83-76F55897E0B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23E1D262-0255-4EDA-AC83-76F55897E0B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23E1D262-0255-4EDA-AC83-76F55897E0B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9BCDC0F1-D5F6-4971-8CA8-72D0E78EB8A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9BCDC0F1-D5F6-4971-8CA8-72D0E78EB8A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BCDC0F1-D5F6-4971-8CA8-72D0E78EB8A2}.Release|Any CPU.ActiveCfg = Release|Any CPU

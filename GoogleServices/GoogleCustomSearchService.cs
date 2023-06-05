@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GoogleService;
 
-public class GoogleCustomSearchService : IGoogleSearchRepository, IDisposable
+public class GoogleCustomSearchService : IGoogleSearchRepository
 {
     private readonly ILogger<GoogleCustomSearchService> _logger;
     private readonly HttpClient _httpClient;
@@ -40,9 +40,10 @@ public class GoogleCustomSearchService : IGoogleSearchRepository, IDisposable
         HttpResponseMessage response;
         try
         {
-            response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
+            response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get,
+                new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
         }
-        catch (HttpRequestException e)   
+        catch (HttpRequestException e)
         {
             _logger.LogError(e, "Request to Google Custom Search API failed.");
             throw;
@@ -52,26 +53,36 @@ public class GoogleCustomSearchService : IGoogleSearchRepository, IDisposable
             _logger.LogCritical(e, "Failed to send http request.");
             throw;
         }
-        
+
         // If the response is not successful, log a warning and return an empty list.
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Failed to get results from google. Status code: {StatusCode}. Reason: {Reason}. Request message: {RequestMessage}", 
-                response.StatusCode, response.ReasonPhrase, response.RequestMessage);
+            _logger.LogWarning("Failed to get results from google. Status Code: {StatusCode}. Reason: {ReasonPhrase}",
+                response.StatusCode, response.ReasonPhrase);
             return new List<Uri>();
         }
 
         // Deserialize the response.
-        var googleResult = JsonConvert.DeserializeObject<GoogleResult>(await response.Content.ReadAsStringAsync());
+        GoogleResult? googleResult;
+        try
+        {
+            googleResult = JsonConvert.DeserializeObject<GoogleResult>(await response.Content.ReadAsStringAsync());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to deserialize google response.");
+            throw;
+        }
+
         if (googleResult is not { Items: { } })
         {
-            _logger.LogError("Failed to get items from google search. Response: {Response}", response.Content);
+            _logger.LogError(string.Format("Failed to get items from google search: {0}.", sQuery));
             throw new ArgumentException("Failed to get items from google search.");
         }
 
         // Get the first iCount results.
         List<Uri> uriList = GetUriList(googleResult.Items, iCount);
-        
+
         return uriList;
     }
 
@@ -86,34 +97,26 @@ public class GoogleCustomSearchService : IGoogleSearchRepository, IDisposable
         var uriList = new List<Uri>();
         foreach (GoogleResult.GoogleItem googleItem in googleItems)
         {
-            if (!Uri.TryCreate(googleItem.Link, UriKind.Absolute, out Uri? uri)) 
+            if (!Uri.TryCreate(googleItem.Link, UriKind.Absolute, out Uri? uri))
                 continue; // Skip invalid URIs.
-            
+
             uriList.Add(uri);
-            
-            if (uriList.Count == iCount) 
+
+            if (uriList.Count == iCount)
                 break; // Stop if the desired count is reached.
         }
+
         return uriList;
     }
 
     [JsonObject]
     private class GoogleResult
     {
-        [JsonProperty("items")]
-        public List<GoogleItem> Items { get; set; } = new();
+        [JsonProperty("items")] public List<GoogleItem> Items { get; set; } = new();
 
         internal class GoogleItem
         {
-            [JsonProperty("link")]
-            public string Link { get; set; } = "";
+            [JsonProperty("link")] public string Link { get; set; } = "";
         }
     }
-
-    public void Dispose()
-    {
-        _httpClient.Dispose();
-        GC.SuppressFinalize(this);
-    }
 }
-
