@@ -1,0 +1,123 @@
+﻿{
+  "type": "game",
+  "name": "Example Game",
+  "steam_appid": 12345,
+  "detailed_description": "This is a detailed description of the game.",
+  "about_the_game": "This is some information about the game.",
+  "short_description": "Short description of the game.",
+  "price_overview": {
+    "currency": "USD",
+    "initial": 1999,
+    "final": 1499,
+    "discount_percent": 25,
+    "initial_formatted": "$19.99",
+    "final_formatted": "$14.99"
+  },
+  "categories": [
+    {
+      "id": 1,
+      "description": "Single-player"
+    },
+    {
+      "id": 2,
+      "description": "Multi-player"
+    }
+  ],
+  "genres": [
+    {
+      "id": "1",
+      "description": "Action"
+    },
+    {
+      "id": "2",
+      "description": "Adventure"
+    }
+  ],
+  "screenshots": [
+    {
+      "id": 1,
+      "path_thumbnail": "thumbnail1.jpg",
+      "path_full": "screenshot1.jpg"
+    },
+    {
+      "id": 2,
+      "path_thumbnail": "thumbnail2.jpg",
+      "path_full": "screenshot2.jpg"
+    }
+  ],
+  "movies": [
+    {
+      "id": 1,
+      "name": "Trailer",
+      "thumbnail": "trailer_thumbnail.jpg",
+      "webm": {
+        "480": "trailer480p.webm",
+        "720": "trailer720p.webm"
+      },
+      "mp4": {
+        "480": "trailer480p.mp4",
+        "720": "trailer720p.mp4"
+      },
+      "highlight": true
+    }
+  ],
+  "system_requirements": {
+    "minimum": "Minimum system requirements for the game.",
+    "recommended": "Recommended system requirements for the game."
+  },
+  "game_info": {
+    "screenshots": [
+      {
+        "id": 1,
+        "path_thumbnail": "game_screenshot1.jpg",
+        "path_full": "game_screenshot1.jpg"
+      }
+    ],
+    "movies": [
+      {
+        "id": 1,
+        "name": "Gameplay Trailer",
+        "thumbnail": "gameplay_trailer_thumbnail.jpg",
+        "webm": {
+          "480": "gameplay_trailer480p.webm",
+          "720": "gameplay_trailer720p.webm"
+        },
+        "mp4": {
+          "480": "gameplay_trailer480p.mp4",
+          "720": "gameplay_trailer720p.mp4"
+        },
+        "highlight": true
+      }
+    ],
+    "recommendations": {
+      "total": 100
+    },
+    "achievements": {
+      "total": 50,
+      "highlighted": [
+        {
+          "name": "First Achievement",
+          "path": "achievements/first.png"
+        },
+        {
+          "name": "Second Achievement",
+          "path": "achievements/second.png"
+        }
+      ]
+    },
+    "release_date": {
+      "coming_soon": false,
+      "date": "2023-06-01"
+    },
+    "support_info": {
+      "url": "https://examplegame.com/support",
+      "email": "support@examplegame.com"
+    },
+    "background": "background.jpg",
+    "background_raw": "background_raw.jpg",
+    "content_descriptors": {
+      "ids": [1, 2, 3],
+      "notes": "This game contains violence and strong language."
+    }
+  }
+}

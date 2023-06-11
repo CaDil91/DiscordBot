@@ -1,9 +1,4 @@
-﻿using AzureServices;
-using DiscordBot.DiscordBot.Core;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
-namespace DiscordBot;
+﻿namespace DiscordBot;
 
 public class CompositionRootTests
 {

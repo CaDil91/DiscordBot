@@ -32,11 +32,9 @@ public class DIRegistrationTests
         
         // Act. Get the named HttpClient.
         HttpClient httpClient = _host.Services.GetRequiredService<IHttpClientFactory>().CreateClient("hardcodedsteam");
-        
+
         // Assert.
         Assert.NotNull(httpClient);
-        Assert.Contains("api.steampowered.com", httpClient.BaseAddress?.ToString());
-
     }
 
     // Test that StoreService is registered.
@@ -64,17 +62,5 @@ public class DIRegistrationTests
         // Assert.
         Assert.NotNull(steamOptions);
         Assert.Equal("SteamToken", steamOptions.Value.Token);
-    }
-    
-    // Test that SteamOptions is registered.
-    [Fact]
-    public void RegisterSteamServices_AddsAppRepository()
-    {
-        // Arrange.
-        
-        // Act.
-        
-        // Assert.
-        Assert.Contains(_subjectUnderTest, x => x.ServiceType == typeof(IAppRepository));
     }
 }

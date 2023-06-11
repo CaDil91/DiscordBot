@@ -1,7 +1,4 @@
-﻿using Azure;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using GoogleService;
+﻿using GoogleService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

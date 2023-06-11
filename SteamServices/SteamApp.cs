@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SteamServices;
 
@@ -13,16 +12,7 @@ public class SteamApp
     
     [JsonProperty("steam_appid")]
     public int SteamAppid { get; set; }
-    
-    [JsonProperty("required_age")]
-    public int RequiredAge { get; set; }
-    
-    [JsonProperty("is_free")]
-    public bool IsFree { get; set; }
-    
-    [JsonProperty("controller_support")]
-    public string? ControllerSupport { get; set; }
-    
+
     [JsonProperty("detailed_description")]
     public string? DetailedDescription { get; set; }
     
@@ -32,47 +22,8 @@ public class SteamApp
     [JsonProperty("short_description")]
     public string? ShortDescription { get; set; }
     
-    [JsonProperty("supported_languages")]
-    public string? SupportedLanguages { get; set; }
-    
-    [JsonProperty("reviews")]
-    public string? Reviews { get; set; }
-    
-    [JsonProperty("header_image")]
-    public string? HeaderImage { get; set; }
-    
-    [JsonProperty("website")]
-    public string? Website { get; set; }
-    
-    [JsonProperty("pc_requirements")]
-    public SystemRequirements? PcRequirements { get; set; }
-    
-    [JsonProperty("mac_requirements")]
-    public SystemRequirements? MacRequirements { get; set; }
-    
-    [JsonProperty("linux_requirements")]
-    public SystemRequirements? LinuxRequirements { get; set; }
-    
-    [JsonProperty("legal_notice")]
-    public string? LegalNotice { get; set; }
-    
-    [JsonProperty("developers")]
-    public List<string>? Developers { get; set; }
-    
-    [JsonProperty("publishers")]
-    public List<string>? Publishers { get; set; }
-    
     [JsonProperty("price_overview")]
     public PriceOverview? MyPriceOverview { get; set; }
-    
-    [JsonProperty("packages")]
-    public List<int>? Packages { get; set; }
-    
-    [JsonProperty("package_groups")]
-    public List<PackageGroup>? PackageGroups { get; set; }
-    
-    [JsonProperty("platforms")]
-    public PlatformAvailability? Platforms { get; set; }
     
     [JsonProperty("categories")]
     public List<Category>? Categories { get; set; }

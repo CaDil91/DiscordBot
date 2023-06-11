@@ -1,6 +1,4 @@
-﻿using Azure.Identity;
-using Microsoft.Extensions.Azure;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
 namespace AzureServices;
@@ -9,6 +7,9 @@ public static class DIRegistrations
 {
     public static IServiceCollection RegisterAzureServices(this IServiceCollection services)
     {
+        // Add Azure app configuration.
+        services.AddAzureAppConfiguration();
+        
         // Add AzureOptions
         services.AddOptions<AzureOptions>()
             .Configure<IConfiguration>((options, configuration) =>

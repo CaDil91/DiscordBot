@@ -55,25 +55,29 @@ public class SteamStoreService : IStoreService
     /// </summary>
     /// <param name="appId">App to get.</param>
     /// <returns></returns>
-    private async Task<SteamApp?> GetSteamAppAsync(string appId)
+    public async Task<SteamApp?> GetSteamAppAsync(string appId)
     {
         // Query the Steam API with the given appId.
-        string? response = await HandleApiQueryAsync(new Uri($"https://store.steampowered.com/api/appdetails?appids={appId}"));
-        if (string.IsNullOrEmpty(response)) return null;
-        
-        // Validate response is json, and convert to SteamApp.
-        if (!JObject.Parse(response).TryGetValue(appId, out _)) return null;
-        JToken? jToken = JObject.Parse(response)[appId]?["data"] ?? null;
-        var steamApp = jToken?.ToObject<SteamApp>();
+        string? response = await QueryApiAsync(new Uri($"https://store.steampowered.com/api/appdetails?appids={appId}"), true);
+        if (string.IsNullOrEmpty(response) || !response.StartsWith("{") || !response.EndsWith("}")) return null;
 
+        // Safely convert response to a JObject.
+        JObject jResponse = JObject.Parse(response);
+        
+        // Safely collect the data node of the first child of the response.
+        JToken? jToken = jResponse[appId]?["data"];
+        var steamApp = jToken?.ToObject<SteamApp>();
+        
         return steamApp;
     }
 
     /// <summary>
     /// Handles the http request to the Steam API.
     /// </summary>
+    /// <param name="uri">Uri to query.</param>
+    /// <param name="bValidateResponseIsJson">Validate the response is json.</param>
     /// <returns>Steams http response as ReadAsStringAsync()</returns>
-    private async Task<string?> HandleApiQueryAsync(Uri uri)
+    public async Task<string?> QueryApiAsync(Uri uri, bool bValidateResponseIsJson = false)
     {
         HttpResponseMessage sResponse;
         try
@@ -83,17 +87,25 @@ public class SteamStoreService : IStoreService
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to query Steam API.");
-            return string.Empty;
+            return null;
         }
 
-        if (sResponse.IsSuccessStatusCode) return await sResponse.Content.ReadAsStringAsync();
-        
         // Log if the response was unsuccessful.
-        _logger.LogWarning(string.Format("Failed to query Steam API. Url: {0}. Status Code: {1}. Reason: {2}.",
-            uri.AbsoluteUri, sResponse.StatusCode, sResponse.ReasonPhrase));
-        return null;
-
-
+        if (!sResponse.IsSuccessStatusCode) 
+            _logger.LogWarning(string.Format("Failed to query Steam API. Url: {0}. Status Code: {1}. Reason: {2}.",
+                uri.AbsoluteUri, sResponse.StatusCode, sResponse.ReasonPhrase));
+        
+        // Validate response is json.
+        if (bValidateResponseIsJson 
+            && sResponse.Content.Headers.ContentType?.MediaType is { } && sResponse.Content.Headers.ContentType != null 
+            && !sResponse.Content.Headers.ContentType.MediaType.Equals("application/json"))
+        {
+            _logger.LogWarning(string.Format("Failed to query Steam API. Url: {0}. Status Code: {1}. Reason: {2}.",
+                uri.AbsoluteUri, sResponse.StatusCode, sResponse.ReasonPhrase));
+            return string.Empty;
+        }
+        
+        return await sResponse.Content.ReadAsStringAsync();
     }
 
     /*public async Task<int> GetAppPlayerCountAsync(int sAppId)

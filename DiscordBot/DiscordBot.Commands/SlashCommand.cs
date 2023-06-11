@@ -23,8 +23,6 @@ public class SlashCommand : ICommand
         set => _data = value;
     }
 
-    public string ResponseMessage { get; set; } = "";
-
     public SlashCommand()
     {
     }
@@ -48,9 +46,9 @@ public class SlashCommand : ICommand
         if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.DeferAsync();
     }
     
-    public async Task FollowupAsync()
+    public async Task FollowupAsync(string sResponseMessage)
     {
-        if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.FollowupAsync(ResponseMessage);
+        if (WrappedSocketSlashCommand != null) await WrappedSocketSlashCommand.FollowupAsync(sResponseMessage);
     }
 
     public override string ToString()

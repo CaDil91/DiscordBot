@@ -32,18 +32,39 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         var slashCommand = new SlashCommand(socketSlashCommand);
         await slashCommand.DeferAsync();
         if (!slashCommand.ValidateCommand()) return;
-        await RunSlashCommandAsync(slashCommand);
-        await slashCommand.FollowupAsync();
+        string commandResult = await RunSlashCommandAsync(slashCommand);
+        await slashCommand.FollowupAsync(commandResult);
     }
 
     /// <summary>
-    /// TODO: Add documentation.
+    /// 
     /// </summary>
     /// <param name="slashCommand"></param>
-    private async Task RunSlashCommandAsync(SlashCommand slashCommand)
+    private async Task<string> RunSlashCommandAsync(ICommand slashCommand)
     {
-        List<SteamApp> steamApps = await _steamService.GetAppsAsync("halo");
-        // TODO: Return results to user.
-        await Task.CompletedTask;
+        List<SteamApp> steamApps = new();
+        try
+        {
+            steamApps = await _steamService.GetAppsAsync("halo", 3);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unexpected error getting SteamApps.");
+        }
+
+        // Return results to user.
+        List<string> steamAppUrls;
+        if (steamApps.Count == 0)
+        {
+            steamAppUrls = new List<string> {"No results found."};
+        }
+        else
+        {
+            steamAppUrls = steamApps
+                .Select(steamApp => $"steam://openurl/{steamApp.Url}")
+                .ToList();
+        }
+
+        return string.Join("\n", steamAppUrls);
     }
 }
