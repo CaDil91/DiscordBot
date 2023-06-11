@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using DiscordBot.DiscordBot.Commands;
 using Microsoft.Extensions.Logging;
 using SteamServices;
@@ -32,15 +33,15 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         var slashCommand = new SlashCommand(socketSlashCommand);
         await slashCommand.DeferAsync();
         if (!slashCommand.ValidateCommand()) return;
-        string commandResult = await RunSlashCommandAsync(slashCommand);
-        await slashCommand.FollowupAsync(commandResult);
+        List<Embed> commandResult = await RunSlashCommandAsync(slashCommand);
+        await slashCommand.FollowupAsync("", embeds: commandResult.ToArray());
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="slashCommand"></param>
-    private async Task<string> RunSlashCommandAsync(ICommand slashCommand)
+    private async Task<List<Embed>> RunSlashCommandAsync(ICommand slashCommand)
     {
         List<SteamApp> steamApps = new();
         try
@@ -53,18 +54,14 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         }
 
         // Return results to user.
-        List<string> steamAppUrls;
-        if (steamApps.Count == 0)
-        {
-            steamAppUrls = new List<string> {"No results found."};
-        }
-        else
-        {
-            steamAppUrls = steamApps
-                .Select(steamApp => $"steam://openurl/{steamApp.Url}")
-                .ToList();
-        }
+        List<Embed> embeds = steamApps
+            .Select(steamApp => new EmbedBuilder()
+                .WithTitle(steamApp.Name)
+                .WithUrl(steamApp.Url)
+                .WithDescription(steamApp.AboutTheGame)
+                .Build())
+            .ToList();
 
-        return string.Join("\n", steamAppUrls);
+        return embeds;
     }
 }
