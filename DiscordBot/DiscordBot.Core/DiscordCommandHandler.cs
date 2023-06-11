@@ -58,7 +58,8 @@ public class DiscordCommandHandler : IDiscordCommandHandler
             .Select(steamApp => new EmbedBuilder()
                 .WithTitle(steamApp.Name)
                 .WithUrl(steamApp.Url)
-                .WithDescription(steamApp.AboutTheGame)
+                .WithDescription(steamApp.ShortDescription)
+                .WithImageUrl(steamApp.HeaderImage)
                 .Build())
             .ToList();
 

@@ -6,12 +6,15 @@ public class SteamApp
 {
     [JsonProperty("type")]
     public string? Type { get; set; }
-    
+
     [JsonProperty("name")]
     public string? Name { get; set; }
     
     [JsonProperty("steam_appid")]
     public int SteamAppid { get; set; }
+
+    [JsonProperty("header_image")]
+    public string? HeaderImage { get; set; } = "https://store.akamai.steamstatic.com/public/shared/images/header/logo_steam.svg?t=962016";
 
     [JsonProperty("detailed_description")]
     public string? DetailedDescription { get; set; }
