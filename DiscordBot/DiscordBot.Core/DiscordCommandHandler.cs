@@ -21,32 +21,43 @@ public class DiscordCommandHandler : IDiscordCommandHandler
     /// Verify SocketSlashCommand and send to wrapper/adapter.
     /// SocketSlashCommand is difficult to mock for unit testing. All private.
     /// </summary>
-    /// <param name="socketSlashCommand">Discord.WebSocket.SocketSlashCommand</param>
-    public async Task HandleSlashCommandAsync(SocketSlashCommand? socketSlashCommand)
+    /// <param name="discordNetSlashCommand">Discord.WebSocket.SocketSlashCommand</param>
+    public async Task HandleSlashCommandAsync(SocketSlashCommand? discordNetSlashCommand)
     {
-        if (socketSlashCommand == null)
+        if (discordNetSlashCommand == null)
         {
             _logger.LogWarning("Null command received.");
             return;
         }
 
-        var slashCommand = new SlashCommand(socketSlashCommand);
-        await slashCommand.DeferAsync();
+        var slashCommand = new SlashCommand(discordNetSlashCommand);
         if (!slashCommand.ValidateCommand()) return;
+        
+        await slashCommand.DeferAsync();
         List<Embed> commandResult = await RunSlashCommandAsync(slashCommand);
-        await slashCommand.FollowupAsync("", embeds: commandResult.ToArray());
+
+        if (commandResult.Count > 0)
+        {
+            await slashCommand.FollowupAsync("", embeds: commandResult.ToArray());
+        }
+        else
+        {
+            await slashCommand.FollowupAsync("No results found.");
+        }
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="slashCommand"></param>
-    private async Task<List<Embed>> RunSlashCommandAsync(ICommand slashCommand)
+    private async Task<List<Embed>> RunSlashCommandAsync(SlashCommand slashCommand)
     {
+        SocketSlashCommandDataOption? test = slashCommand.Data?.Options.FirstOrDefault();
+        
         List<SteamApp> steamApps = new();
         try
         {
-            steamApps = await _steamService.GetAppsAsync("halo", 3);
+            steamApps = await _steamService.GetAppsAsync(test?.Value.ToString() ?? string.Empty, 3);
         }
         catch (Exception e)
         {
