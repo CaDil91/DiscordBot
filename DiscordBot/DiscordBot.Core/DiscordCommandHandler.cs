@@ -34,23 +34,17 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         if (!slashCommand.ValidateCommand()) return;
         
         await slashCommand.DeferAsync();
-        List<Embed> commandResult = await RunSlashCommandAsync(slashCommand);
+        List<DiscordResponse> discordResponses = await RunSlashCommandAsync(slashCommand);
 
-        if (commandResult.Count > 0)
-        {
-            await slashCommand.FollowupAsync("", embeds: commandResult.ToArray());
-        }
-        else
-        {
-            await slashCommand.FollowupAsync("No results found.");
-        }
+        foreach (DiscordResponse response in discordResponses) await slashCommand.FollowupAsync
+            (response.Message, embeds: response.Embeds?.ToArray() ?? null, components: response.MessageComponents ?? null);
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="slashCommand"></param>
-    private async Task<List<Embed>> RunSlashCommandAsync(SlashCommand slashCommand)
+    private async Task<List<DiscordResponse>> RunSlashCommandAsync(SlashCommand slashCommand)
     {
         SocketSlashCommandDataOption? test = slashCommand.Data?.Options.FirstOrDefault();
         
@@ -64,16 +58,50 @@ public class DiscordCommandHandler : IDiscordCommandHandler
             _logger.LogError(e, "Unexpected error getting SteamApps.");
         }
 
-        // Return results to user.
-        List<Embed> embeds = steamApps
-            .Select(steamApp => new EmbedBuilder()
-                .WithTitle(steamApp.Name)
-                .WithUrl(steamApp.Url)
-                .WithDescription(steamApp.ShortDescription)
-                .WithImageUrl(steamApp.HeaderImage)
-                .Build())
-            .ToList();
-
-        return embeds;
+        return steamApps.Select(CreateResponse).ToList();
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="steamApp"></param>
+    /// <returns></returns>
+    private static DiscordResponse CreateResponse(SteamApp steamApp)
+    {
+        // Create embeds
+        Embed? embed = new EmbedBuilder()
+            .WithTitle(steamApp.Name)
+            .WithUrl(steamApp.Url)
+            .WithDescription(steamApp.ShortDescription)
+            .WithImageUrl(steamApp.HeaderImage)
+            .Build();
+        if (embed == null) return new DiscordResponse { Message = "Error finding results"};
+
+        ButtonBuilder followButton = new()
+        {
+            Label = "Follow",
+            Style = ButtonStyle.Primary,
+            CustomId = steamApp.SteamAppid.ToString()
+        };
+        ComponentBuilder componentBuilder = new();
+        MessageComponent component = componentBuilder.WithButton(followButton).Build();
+
+        var response = new DiscordResponse
+        {
+            Embeds = new List<Embed> { embed },
+            MessageComponents = component
+        };
+
+        return response;
+    }
+}
+
+/// <summary>
+/// Holds components for a Discord.Net response.
+/// </summary>
+internal class DiscordResponse
+{
+    public List<Embed>? Embeds { get; set; }
+    public MessageComponent? MessageComponents { get; set; }
+    public string Message { get; set; } = "";
 }
