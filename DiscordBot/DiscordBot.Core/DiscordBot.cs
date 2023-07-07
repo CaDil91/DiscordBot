@@ -34,6 +34,7 @@ public class DiscordBot : IDiscordBot
 
         // Add listeners.
         _client.SlashCommandExecuted += _discordCommandHandler.HandleSlashCommandAsync;
+        _client.ButtonExecuted += _discordCommandHandler.HandleButtonAsync;
 
         await Task.Delay(Timeout.Infinite); // Block this task until the program is closed.
     }

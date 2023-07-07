@@ -5,4 +5,5 @@ namespace DiscordBot.DiscordBot.Core;
 public interface IDiscordCommandHandler
 {
     public Task HandleSlashCommandAsync(SocketSlashCommand discordNetSlashCommand);
+    public Task HandleButtonAsync(SocketMessageComponent arg);
 }

@@ -10,6 +10,7 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 {
     private readonly ILogger<DiscordCommandHandler> _logger;
     private readonly IStoreService _steamService;
+    private const string STEAM_FOLLOW_CUSTOM_ID = "SteamFollow";
 
     public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService)
     {
@@ -38,6 +39,28 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 
         foreach (DiscordResponse response in discordResponses) await slashCommand.FollowupAsync
             (response.Message, embeds: response.Embeds?.ToArray() ?? null, components: response.MessageComponents ?? null);
+    }
+
+    public async Task HandleButtonAsync(SocketMessageComponent component)
+    {
+        switch(component.Data.CustomId)
+        {
+            case STEAM_FOLLOW_CUSTOM_ID:
+                
+                // Get message sent above this button.
+                IMessage message = await component.Channel.GetMessageAsync(component.Message.Id);
+                if (message == null) return;
+        
+                // Get embeds from message.
+                IEmbed? embed = message.Embeds.FirstOrDefault();
+        
+                // Get title from embed.
+                string? title = embed?.Title;
+                if (title == null) return;
+                
+                await component.RespondAsync($"{component.User.Mention} has clicked the steam follow button to follow {title}");
+                break;
+        }
     }
 
     /// <summary>
@@ -81,7 +104,7 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         {
             Label = "Follow",
             Style = ButtonStyle.Primary,
-            CustomId = steamApp.SteamAppid.ToString()
+            CustomId = STEAM_FOLLOW_CUSTOM_ID
         };
         ComponentBuilder componentBuilder = new();
         MessageComponent component = componentBuilder.WithButton(followButton).Build();
