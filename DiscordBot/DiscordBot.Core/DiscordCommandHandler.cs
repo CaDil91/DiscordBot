@@ -60,8 +60,13 @@ public class DiscordCommandHandler : IDiscordCommandHandler
                 // Get title from embed.
                 string? title = embed?.Title;
                 if (title == null) return;
-                
-                await component.RespondAsync($"{component.User.Mention} has clicked the steam follow button to follow {title}");
+
+                var context = new SocketCommandContext(_discordClient, component.Message);
+                IReadOnlyCollection<SocketRole>? roles = context.Guild.Roles;
+                SocketRole? role = roles?.FirstOrDefault(r => r.Name == title);
+                if (role == null || roles == null) return;
+
+                await component.RespondAsync($"Guild name {context.Guild.Name} has roles {string.Join(", ", roles)}");
                 break;
         }
     }
