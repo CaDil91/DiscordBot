@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.DiscordBot.Commands;
 using Microsoft.Extensions.Logging;
@@ -10,12 +11,14 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 {
     private readonly ILogger<DiscordCommandHandler> _logger;
     private readonly IStoreService _steamService;
+    private readonly DiscordSocketClient _discordClient;
     private const string STEAM_FOLLOW_CUSTOM_ID = "SteamFollow";
 
-    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService)
+    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService, DiscordSocketClient discordClient)
     {
         _logger = logger;
         _steamService = steamService;
+        _discordClient = discordClient;
     }
 
     /// <summary>

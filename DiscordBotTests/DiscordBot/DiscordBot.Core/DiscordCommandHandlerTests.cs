@@ -1,4 +1,5 @@
-﻿using DiscordBot.DiscordBot.Core;
+﻿using Discord.WebSocket;
+using DiscordBot.DiscordBot.Core;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SteamServices;
@@ -8,17 +9,18 @@ namespace DiscordBot.DiscordBot.DiscordBot.Core;
 public class DiscordCommandHandlerTests
 {
     private readonly Mock<ILogger<DiscordCommandHandler>> _loggerMock;
-    private readonly Mock<IStoreService> _storeService;
 
     private readonly DiscordCommandHandler _subjectUnderTest;
 
     public DiscordCommandHandlerTests()
     {
         _loggerMock = new Mock<ILogger<DiscordCommandHandler>>();
-        _storeService = new Mock<IStoreService>();
+        Mock<IStoreService> storeService = new();
         
-        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object, _storeService.Object);
+        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object, storeService.Object, new Mock<DiscordSocketClient>().Object);
     }
+    
+    
 
     [Fact]
     public async Task SocketSlashCommand_HandleSlashCommandAsync_LogsWarningForNullCommand()

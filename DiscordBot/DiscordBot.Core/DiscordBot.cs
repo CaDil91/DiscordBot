@@ -10,12 +10,12 @@ public class DiscordBot : IDiscordBot
     private readonly IDiscordCommandHandler _discordCommandHandler;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordCommandHandler discordCommandHandler)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordCommandHandler discordCommandHandler, DiscordSocketClient discordClient)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters,
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
-        var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
-        _client = new DiscordSocketClient(discordSocketConfig);
+        //var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
+        _client = discordClient;
         _discordOptions = discordOptions;
         _discordCommandHandler = discordCommandHandler;
     }
@@ -40,7 +40,7 @@ public class DiscordBot : IDiscordBot
     }
 
     /// <summary>
-    ///     Register slash commands.
+    /// Register slash commands.
     /// </summary>
     /// <param name="sName"></param>
     /// <param name="socketGuild"></param>
@@ -63,11 +63,8 @@ public class DiscordBot : IDiscordBot
     }
 
     /// <summary>
-    ///     Check if DiscordBotSocketClient.ConnectionState.Connected == True.
+    /// Check if DiscordBotSocketClient.ConnectionState.Connected == True.
     /// </summary>
     /// <returns>bool</returns>
-    public bool IsConnected()
-    {
-        return _client.ConnectionState == ConnectionState.Connected;
-    }
+    public bool IsConnected() => _client.ConnectionState == ConnectionState.Connected;
 }

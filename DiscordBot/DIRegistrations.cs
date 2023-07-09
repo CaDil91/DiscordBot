@@ -16,6 +16,13 @@ public static class DIRegistrations
     {
         services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
         services.AddSingleton<DiscordBot.Core.DiscordBot>();
+        
+        /*//When working with events that have Cacheable<IMessage, ulong> parameters,
+        //you must enable the message cache in your config settings if you plan to use the cached message entity.
+        var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
+        var client = new DiscordSocketClient(discordSocketConfig);*/
+        services.AddSingleton<DiscordSocketClient>();
+        
         services.AddLogging(x => x.AddConsole());
 
         services.AddOptions<DiscordBotOptions>()
