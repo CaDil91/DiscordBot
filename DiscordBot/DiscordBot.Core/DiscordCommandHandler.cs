@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.DiscordBot.Commands;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,8 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         switch(component.Data.CustomId)
         {
             case STEAM_FOLLOW_CUSTOM_ID:
+
+                await component.DeferAsync();
                 
                 // Get message sent above this button.
                 IMessage message = await component.Channel.GetMessageAsync(component.Message.Id);
@@ -63,10 +66,37 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 
                 var context = new SocketCommandContext(_discordClient, component.Message);
                 IReadOnlyCollection<SocketRole>? roles = context.Guild.Roles;
-                SocketRole? role = roles?.FirstOrDefault(r => r.Name == title);
-                if (role == null || roles == null) return;
+                SocketRole? guildRole = roles?.FirstOrDefault(r => r.Name == title);
 
-                await component.RespondAsync($"Guild name {context.Guild.Name} has roles {string.Join(", ", roles)}");
+                if (component.User is not SocketGuildUser guildUser) return;
+                
+                IReadOnlyCollection<SocketRole>? userRoles = guildUser.Roles;
+                SocketRole? userRole = userRoles?.FirstOrDefault(r => r.Name == title);
+
+                if (guildRole == null)
+                {
+                    RestRole? role = await context.Guild.CreateRoleAsync(title, isMentionable: true);
+                    if (role == null)
+                    {
+                        await context.Channel.SendMessageAsync($"Failed to create role {title}");
+                        return;
+                    }
+                }
+                
+                if (userRole == null)
+                {
+                    await guildUser.AddRoleAsync(guildRole);
+                    await component.FollowupAsync($"Added role {title} to user {guildUser.Username}");
+                    break;
+                }
+
+                await guildUser.RemoveRoleAsync(guildRole);
+                await component.FollowupAsync($"Removed role {title} from user {guildUser .Username}");
+                
+                IReadOnlyCollection<SocketGuildUser> usersInRole = context.Guild.Users.Where(u => u.Roles.Contains(guildRole)).ToList();
+                if (usersInRole.Count == 1 && usersInRole.FirstOrDefault()?.Id == guildUser.Id) usersInRole = new List<SocketGuildUser>();
+                if (usersInRole.Count == 0 && guildRole != null) await guildRole.DeleteAsync();
+
                 break;
         }
     }
@@ -82,7 +112,7 @@ public class DiscordCommandHandler : IDiscordCommandHandler
         List<SteamApp> steamApps = new();
         try
         {
-            steamApps = await _steamService.GetAppsAsync(test?.Value.ToString() ?? string.Empty, 3);
+            steamApps = await _steamService.GetAppsAsync(test?.Value.ToString() ?? string.Empty, 1);
         }
         catch (Exception e)
         {
@@ -110,7 +140,7 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 
         ButtonBuilder followButton = new()
         {
-            Label = "Follow",
+            Label = "Follow/Unfollow",
             Style = ButtonStyle.Primary,
             CustomId = STEAM_FOLLOW_CUSTOM_ID
         };
