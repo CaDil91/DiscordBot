@@ -1,4 +1,5 @@
-﻿using DiscordBot.DiscordBot.Core;
+﻿using Discord.WebSocket;
+using DiscordBot.DiscordBot.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
