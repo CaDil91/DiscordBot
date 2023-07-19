@@ -31,7 +31,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\DiscordBot\DiscordBot.csproj" />
-        <ProjectReference Include="..\SteamServices\SteamServices.csproj" />
     </ItemGroup>
 
     <ItemGroup>
