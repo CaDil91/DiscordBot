@@ -7,6 +7,7 @@ public static class DIRegistrations
 {
     public static IServiceCollection RegisterGoogleServices(this IServiceCollection services)
     {
+        //change
         services.AddHttpClient("hardcodedgoogle", client => { client.BaseAddress = new Uri("https://www.googleapis.com/customsearch/v1"); });
         services.AddSingleton<IGoogleSearchRepository, GoogleCustomSearchService>();
         services.AddOptions<GoogleOptions>()

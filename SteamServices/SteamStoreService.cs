@@ -123,4 +123,28 @@ public class SteamStoreService : IStoreService
         return int.TryParse(jResponse["response"]?["player_count"]?.ToString(), out int iPlayerCount) ? iPlayerCount : 0;
     }*/
 
+    /// <summary>
+    /// Get the news for a given app.
+    /// </summary>
+    /// <param name="appId"></param>
+    /// <param name="lastNewsCheckDate"></param>
+    /// <returns></returns>
+    public IEnumerable<AppNews.NewsItem> GetNewsForApp(int appId, DateTime? lastNewsCheckDate)
+    {
+        
+        string? response = QueryApiAsync(new Uri($"https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/" +
+                                                 $"?appid={appId}&feeds=steam_community_announcements"), true).Result;
+        
+        if (string.IsNullOrEmpty(response) || !response.StartsWith("{") || !response.EndsWith("}")) 
+            return new List<AppNews.NewsItem>();
+        
+        JObject jResponse = JObject.Parse(response);
+        AppNews appNews = jResponse["appnews"]?.ToObject<AppNews>() ?? new AppNews();
+        
+        if (appNews.NewsItems is not { Count: > 0 }) return new List<AppNews.NewsItem>();
+
+        return lastNewsCheckDate != null ? 
+            appNews.NewsItems.Where(newsItem => newsItem.Date > lastNewsCheckDate).ToList() 
+            : appNews.NewsItems.Take(3).ToList();
+    }
 }

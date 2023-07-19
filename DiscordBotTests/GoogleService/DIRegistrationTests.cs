@@ -51,7 +51,7 @@ public class DIRegistrationTests
     }
     
     [Fact]
-    public async Task RegisterGoogleServices_AddsGoogleOptions()
+    public void RegisterGoogleServices_AddsGoogleOptions()
     {
         // Arrange.
         var googleOptions = _host.Services.GetRequiredService<IOptions<GoogleOptions>>();
