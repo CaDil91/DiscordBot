@@ -70,7 +70,7 @@ public class AppNews
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            throw new NotImplementedException("Writing JSON with TimestampConverter is not supported.");
+            throw new NotImplementedException();
         }
     }
 }
