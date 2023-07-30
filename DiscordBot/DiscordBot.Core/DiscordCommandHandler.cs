@@ -13,13 +13,17 @@ public class DiscordCommandHandler : IDiscordCommandHandler
     private readonly ILogger<DiscordCommandHandler> _logger;
     private readonly IStoreService _steamService;
     private readonly DiscordSocketClient _discordClient;
-    private const string STEAM_FOLLOW_CUSTOM_ID = "SteamFollow";
+    private readonly ButtonController _buttonController;
+    private const string STEAM_FOLLOW_CUSTOM_ID = "Steam_Follow";
+    private const string STEAM_UNFOLLOW_CUSTOM_ID = "Steam_Unfollow";
 
-    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService, DiscordSocketClient discordClient)
+    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService, 
+        DiscordSocketClient discordClient, ButtonController buttonController)
     {
         _logger = logger;
         _steamService = steamService;
         _discordClient = discordClient;
+        _buttonController = buttonController;
     }
 
     /// <summary>
@@ -45,58 +49,29 @@ public class DiscordCommandHandler : IDiscordCommandHandler
             (response.Message, embeds: response.Embeds?.ToArray() ?? null, components: response.MessageComponents ?? null);
     }
 
-    public async Task HandleButtonAsync(SocketMessageComponent component)
+    public async Task ButtonHandlerAsync(SocketMessageComponent component)
     {
-        switch(component.Data.CustomId)
+        var componentAdapter = new SocketMessageComponentAdapter(component); // Convert to adapter. TODO: Factory?
+
+        string? commandName = componentAdapter.GetCommandName();
+        if (commandName == null)
+        {
+            _logger.LogError("Unable to get command name from button.");
+            await componentAdapter.RespondAsync("Unable to find command name from component.");
+            return;
+        }
+
+        switch (commandName)
         {
             case STEAM_FOLLOW_CUSTOM_ID:
-
-                await component.DeferAsync();
-                
-                // Get message sent above this button.
-                IMessage message = await component.Channel.GetMessageAsync(component.Message.Id);
-                if (message == null) return;
-        
-                // Get embeds from message.
-                IEmbed? embed = message.Embeds.FirstOrDefault();
-        
-                // Get title from embed.
-                string? title = embed?.Title;
-                if (title == null) return;
-
-                var context = new SocketCommandContext(_discordClient, component.Message);
-                IReadOnlyCollection<SocketRole>? roles = context.Guild.Roles;
-                SocketRole? guildRole = roles?.FirstOrDefault(r => r.Name == title);
-
-                if (component.User is not SocketGuildUser guildUser) return;
-                
-                IReadOnlyCollection<SocketRole>? userRoles = guildUser.Roles;
-                SocketRole? userRole = userRoles?.FirstOrDefault(r => r.Name == title);
-
-                if (guildRole == null)
-                {
-                    RestRole? role = await context.Guild.CreateRoleAsync(title, isMentionable: true);
-                    if (role == null)
-                    {
-                        await context.Channel.SendMessageAsync($"Failed to create role {title}");
-                        return;
-                    }
-                }
-                
-                if (userRole == null)
-                {
-                    await guildUser.AddRoleAsync(guildRole);
-                    await component.FollowupAsync($"Added role {title} to user {guildUser.Username}");
-                    break;
-                }
-
-                await guildUser.RemoveRoleAsync(guildRole);
-                await component.FollowupAsync($"Removed role {title} from user {guildUser .Username}");
-                
-                IReadOnlyCollection<SocketGuildUser> usersInRole = context.Guild.Users.Where(u => u.Roles.Contains(guildRole)).ToList();
-                if (usersInRole.Count == 1 && usersInRole.FirstOrDefault()?.Id == guildUser.Id) usersInRole = new List<SocketGuildUser>();
-                if (usersInRole.Count == 0 && guildRole != null) await guildRole.DeleteAsync();
-
+                await _buttonController.FollowSteamAppAsync(componentAdapter);
+                break;
+            case STEAM_UNFOLLOW_CUSTOM_ID:
+                await _buttonController.UnfollowSteamAppAsync(componentAdapter);
+                break;
+            default:
+                _logger.LogError($"Invalid command name {commandName}.");
+                await componentAdapter.RespondAsync("Invalid command name.");
                 break;
         }
     }
@@ -107,12 +82,12 @@ public class DiscordCommandHandler : IDiscordCommandHandler
     /// <param name="slashCommand"></param>
     private async Task<List<DiscordResponse>> RunSlashCommandAsync(SlashCommand slashCommand)
     {
-        SocketSlashCommandDataOption? test = slashCommand.Data?.Options.FirstOrDefault();
+        SocketSlashCommandDataOption? dataOptions = slashCommand.Data?.Options.FirstOrDefault();
         
         List<SteamApp> steamApps = new();
         try
         {
-            steamApps = await _steamService.GetAppsAsync(test?.Value.ToString() ?? string.Empty, 1);
+            steamApps = await _steamService.GetAppsAsync(dataOptions?.Value.ToString() ?? string.Empty, 1);
         }
         catch (Exception e)
         {

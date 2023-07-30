@@ -16,6 +16,7 @@ public static class DIRegistrations
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
         services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
+        services.AddSingleton<ButtonController>();
         services.AddSingleton<DiscordBot.Core.DiscordBot>();
         
         /*//When working with events that have Cacheable<IMessage, ulong> parameters,
