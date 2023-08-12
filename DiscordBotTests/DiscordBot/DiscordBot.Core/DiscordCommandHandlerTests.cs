@@ -17,7 +17,7 @@ public class DiscordCommandHandlerTests
         _loggerMock = new Mock<ILogger<DiscordCommandHandler>>();
         Mock<IStoreService> storeService = new();
         
-        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object, storeService.Object, new Mock<DiscordSocketClient>().Object);
+        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object, storeService.Object, new Mock<DiscordButtonController>().Object);
     }
     
     

@@ -15,7 +15,7 @@ public class SteamStoreService : IStoreService
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="httpClientFactory"></param>
-    /// <param name="steamStoreRepository"></param>S
+    /// <param name="steamStoreRepository"></param>
     public SteamStoreService(IHttpClientFactory httpClientFactory, ILogger<SteamStoreService> logger, IGoogleSearchRepository steamStoreRepository)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");

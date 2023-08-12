@@ -1,0 +1,13 @@
+﻿using Discord;
+
+namespace DiscordBot.DiscordBot.Core;
+
+/// <summary>
+/// Holds components for a Discord.Net response.
+/// </summary>
+public class DiscordResponse
+{
+    public List<Embed>? Embeds { get; set; }
+    public MessageComponent? MessageComponents { get; set; }
+    public string Message { get; set; } = "";
+}

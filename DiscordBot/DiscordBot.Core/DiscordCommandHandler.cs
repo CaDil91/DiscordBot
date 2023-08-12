@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
-using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.DiscordBot.Commands;
 using Microsoft.Extensions.Logging;
@@ -12,18 +10,15 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 {
     private readonly ILogger<DiscordCommandHandler> _logger;
     private readonly IStoreService _steamService;
-    private readonly DiscordSocketClient _discordClient;
-    private readonly ButtonController _buttonController;
+    private readonly DiscordButtonController _discordButtonController;
     private const string STEAM_FOLLOW_CUSTOM_ID = "Steam_Follow";
     private const string STEAM_UNFOLLOW_CUSTOM_ID = "Steam_Unfollow";
 
-    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService, 
-        DiscordSocketClient discordClient, ButtonController buttonController)
+    public DiscordCommandHandler(ILogger<DiscordCommandHandler> logger, IStoreService steamService, DiscordButtonController discordButtonController)
     {
         _logger = logger;
         _steamService = steamService;
-        _discordClient = discordClient;
-        _buttonController = buttonController;
+        _discordButtonController = discordButtonController;
     }
 
     /// <summary>
@@ -33,56 +28,60 @@ public class DiscordCommandHandler : IDiscordCommandHandler
     /// <param name="discordNetSlashCommand">Discord.WebSocket.SocketSlashCommand</param>
     public async Task HandleSlashCommandAsync(SocketSlashCommand? discordNetSlashCommand)
     {
+        // Get valid command from slash command.
         if (discordNetSlashCommand == null)
         {
-            _logger.LogWarning("Null command received.");
+            _logger.LogError("Null slash command received.");
             return;
         }
-
-        var slashCommand = new SlashCommand(discordNetSlashCommand);
-        if (!slashCommand.ValidateCommand()) return;
+        var slashCommand = new SocketSlashCommandAdapter(discordNetSlashCommand);
+        await slashCommand.DeferAsync(); // Defer response to avoid timeout.
         
-        await slashCommand.DeferAsync();
+        //if (!slashCommand.ValidateCommand()) return; // TODO: Move to RunSlashCommandAsync?
+        
         List<DiscordResponse> discordResponses = await RunSlashCommandAsync(slashCommand);
-
         foreach (DiscordResponse response in discordResponses) await slashCommand.FollowupAsync
             (response.Message, embeds: response.Embeds?.ToArray() ?? null, components: response.MessageComponents ?? null);
     }
 
-    public async Task ButtonHandlerAsync(SocketMessageComponent component)
+    public async Task HandleButtonCommandAsync(SocketMessageComponent component)
     {
-        var componentAdapter = new SocketMessageComponentAdapter(component); // Convert to adapter. TODO: Factory?
-
-        string? commandName = componentAdapter.GetCommandName();
+        var socketMessageComponentAdapter = new SocketMessageComponentAdapter(component); // Convert to adapter.
+        await socketMessageComponentAdapter.DeferAsync(); // Defer response to avoid timeout.
+        
+        string? commandName = socketMessageComponentAdapter.GetCommandName();
         if (commandName == null)
         {
             _logger.LogError("Unable to get command name from button.");
-            await componentAdapter.RespondAsync("Unable to find command name from component.");
+            await socketMessageComponentAdapter.RespondAsync("Unable to find command name from component.");
             return;
         }
 
+        var discordResponses = new List<DiscordResponse>();
         switch (commandName)
         {
             case STEAM_FOLLOW_CUSTOM_ID:
-                await _buttonController.FollowSteamAppAsync(componentAdapter);
+                discordResponses = await _discordButtonController.FollowSteamAppAsync(socketMessageComponentAdapter);
                 break;
             case STEAM_UNFOLLOW_CUSTOM_ID:
-                await _buttonController.UnfollowSteamAppAsync(componentAdapter);
+                discordResponses = await _discordButtonController.UnfollowSteamAppAsync(socketMessageComponentAdapter);
                 break;
             default:
                 _logger.LogError($"Invalid command name {commandName}.");
-                await componentAdapter.RespondAsync("Invalid command name.");
+                await socketMessageComponentAdapter.RespondAsync("Invalid command name.");
                 break;
         }
+        
+        foreach (DiscordResponse discordResponse in discordResponses) await socketMessageComponentAdapter.FollowupAsync(discordResponse.Message);
     }
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="slashCommand"></param>
-    private async Task<List<DiscordResponse>> RunSlashCommandAsync(SlashCommand slashCommand)
+    /// <param name="socketSlashCommandAdapter"></param>
+    private async Task<List<DiscordResponse>> RunSlashCommandAsync(SocketSlashCommandAdapter socketSlashCommandAdapter)
     {
-        SocketSlashCommandDataOption? dataOptions = slashCommand.Data?.Options.FirstOrDefault();
+        SocketSlashCommandDataOption? dataOptions = socketSlashCommandAdapter.Data?.Options.FirstOrDefault();
         
         List<SteamApp> steamApps = new();
         try
@@ -115,12 +114,19 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 
         ButtonBuilder followButton = new()
         {
-            Label = "Follow/Unfollow",
+            Label = "Follow",
             Style = ButtonStyle.Primary,
             CustomId = STEAM_FOLLOW_CUSTOM_ID
         };
+        ButtonBuilder unfollowButton = new()
+        {
+            Label = "Unfollow",
+            Style = ButtonStyle.Danger,
+            CustomId = STEAM_UNFOLLOW_CUSTOM_ID
+        };
+        
         ComponentBuilder componentBuilder = new();
-        MessageComponent component = componentBuilder.WithButton(followButton).Build();
+        MessageComponent component = componentBuilder.WithButton(followButton).WithButton(unfollowButton).Build();
 
         var response = new DiscordResponse
         {
@@ -130,14 +136,4 @@ public class DiscordCommandHandler : IDiscordCommandHandler
 
         return response;
     }
-}
-
-/// <summary>
-/// Holds components for a Discord.Net response.
-/// </summary>
-internal class DiscordResponse
-{
-    public List<Embed>? Embeds { get; set; }
-    public MessageComponent? MessageComponents { get; set; }
-    public string Message { get; set; } = "";
 }
