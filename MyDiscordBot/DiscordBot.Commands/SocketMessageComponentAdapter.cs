@@ -41,7 +41,7 @@ namespace DiscordBot.DiscordBot.Commands;
             return SocketMessageComponent.RespondAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public Task<RestFollowupMessage> FollowupAsync(
             string? text = null,
             Embed[]? embeds = null,
