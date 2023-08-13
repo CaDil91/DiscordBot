@@ -24,66 +24,20 @@ public class GoogleCustomSearchService : IGoogleSearchRepository
         _logger = logger;
         _cx = googleOptions.Value.SteamStoreCx;
         _googleApiKey = googleOptions.Value.Key;
-
-        // Build the default query parameters using the retrieved API key and other options.;
     }
 
-    /// <summary>
-    /// Retrieves custom search results from Google asynchronously.
-    /// </summary>
-    /// <param name="sQuery">The search query string.</param>
-    /// <param name="iCount">The number of search results to retrieve. Default is 10.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of URIs representing the search results.</returns>
+    /// <inheritdoc/>
     public async Task<List<Uri>> GetCustomSearchResultsAsync(string sQuery, int iCount = 10)
     {
-        // Send HTTP request to Google and get response.
-        HttpResponseMessage response;
-        try
-        {
-            response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get,
-                new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
-        }
-        catch (HttpRequestException e)
-        {
-            _logger.LogError(e, "Request to Google Custom Search API failed.");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogCritical(e, "Failed to send http request.");
-            throw;
-        }
-
-        // If the response is not successful, log a warning and return an empty list.
+        HttpResponseMessage response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Failed to get results from google. Status Code: {StatusCode}. Reason: {ReasonPhrase}",
-                response.StatusCode, response.ReasonPhrase);
+            _logger.LogWarning("Failed to get results from google. Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
             return new List<Uri>();
         }
-
-        // Deserialize the response.
-        GoogleResult? googleResult;
-        try
-        {
-            googleResult = JsonConvert.DeserializeObject<GoogleResult>(await response.Content.ReadAsStringAsync());
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to deserialize google response.");
-            throw;
-        }
-
-        if (googleResult is not { Items: { } })
-        {
-            _logger.LogError(string.Format("Failed to get items from google search: {0}.", sQuery));
-            throw new ArgumentException("Failed to get items from google search.");
-        }
-
-        // Get the first iCount results.
-        List<Uri> uriList = GetUriList(googleResult.Items, iCount);
-
-        return uriList;
+        
+        var googleResult = JsonConvert.DeserializeObject<GoogleResult>(await response.Content.ReadAsStringAsync());
+        return googleResult?.Items == null ? new List<Uri>() : GetUriList(googleResult.Items, iCount);
     }
 
     /// <summary>
