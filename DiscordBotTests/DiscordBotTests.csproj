@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MyDiscordBot\MyDiscordBot.csproj" />
+        <ProjectReference Include="..\SteamAppsDiscordBot\SteamAppsDiscordBot.csproj" />
     </ItemGroup>
 
     <ItemGroup>

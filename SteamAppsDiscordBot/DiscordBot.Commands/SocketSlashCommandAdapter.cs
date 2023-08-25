@@ -7,11 +7,11 @@ namespace DiscordBot.DiscordBot.Commands;
 /// <summary>
 /// SocketSlashCommand adapter.
 /// </summary>
-public class DiscordSocketSlashCommandAdapter
+public class SocketSlashCommandAdapter
 {
     private readonly SocketSlashCommand _socketSlashCommand;
 
-    public DiscordSocketSlashCommandAdapter(SocketSlashCommand wrappedCommand)
+    public SocketSlashCommandAdapter(SocketSlashCommand wrappedCommand)
     {
         _socketSlashCommand = wrappedCommand;
     }

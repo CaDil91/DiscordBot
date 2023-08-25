@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleServices", "GoogleSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamServices", "SteamServices\SteamServices.csproj", "{64A226A9-0726-4056-8EB3-A71A751E5953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyDiscordBot", "MyDiscordBot\MyDiscordBot.csproj", "{47504837-A0B0-4F63-92A2-6C05830CD0C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamAppsDiscordBot", "SteamAppsDiscordBot\SteamAppsDiscordBot.csproj", "{47504837-A0B0-4F63-92A2-6C05830CD0C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
