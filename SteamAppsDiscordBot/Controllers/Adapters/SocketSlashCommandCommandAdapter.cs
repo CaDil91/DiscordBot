@@ -1,23 +1,24 @@
 ﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
-namespace DiscordBot.DiscordBot.Commands;
+namespace DiscordBot.Controllers.Adapters;
 
 /// <summary>
 /// SocketSlashCommand adapter.
 /// </summary>
-public class SocketSlashCommandAdapter
+public class SocketSlashCommandCommandAdapter : ICommandAdapter<SocketSlashCommandData>
 {
     private readonly SocketSlashCommand _socketSlashCommand;
+    public SocketSlashCommandData CommandData => _socketSlashCommand.Data;
+    public string CommandName => CommandData.Name;
 
-    public SocketSlashCommandAdapter(SocketSlashCommand wrappedCommand)
+    public SocketSlashCommandCommandAdapter(SocketSlashCommand wrappedCommand)
     {
         _socketSlashCommand = wrappedCommand;
     }
 
-    public SocketSlashCommandData Data => _socketSlashCommand.Data;
-    
     public Task RespondAsync(
         string? text = null,
         Embed[]? embeds = null,

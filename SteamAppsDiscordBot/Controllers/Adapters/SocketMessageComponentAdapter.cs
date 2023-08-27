@@ -1,22 +1,17 @@
 ﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using DiscordBot.DiscordBot.Core;
 
-namespace DiscordBot.DiscordBot.Commands;
+namespace DiscordBot.Controllers.Adapters;
 
     /// <summary>
     /// Adapter class to adapt the SocketMessageComponent to the IMessageComponentAdapter interface.
     /// </summary>
-    public class SocketMessageComponentAdapter
+    public class SocketMessageComponentAdapter : ICommandAdapter<IComponentInteractionData>
     {
-        internal readonly SocketMessageComponent SocketMessageComponent;
-        
-        IComponentInteractionData Data => SocketMessageComponent.Data;
-        public SocketUserMessage Message => SocketMessageComponent.Message;
-        public SocketUser User => SocketMessageComponent.User;
-        public ISocketMessageChannel Channel => SocketMessageComponent.Channel;
-        public ulong? GuildId => SocketMessageComponent.GuildId;
+        private readonly SocketMessageComponent _socketMessageComponent;
+        public IComponentInteractionData CommandData => _socketMessageComponent.Data;
+        public string CommandName => CommandData.CustomId;
 
         /// <summary>
         /// Initializes a new instance of the SocketMessageComponentAdapter class.
@@ -24,8 +19,14 @@ namespace DiscordBot.DiscordBot.Commands;
         /// <param name="socketMessageComponent">The SocketMessageComponent instance to be adapted.</param>
         public SocketMessageComponentAdapter(SocketMessageComponent socketMessageComponent)
         {
-            SocketMessageComponent = socketMessageComponent;
+            _socketMessageComponent = socketMessageComponent;
         }
+        
+        
+        public SocketUserMessage Message => _socketMessageComponent.Message;
+        public SocketUser User => _socketMessageComponent.User;
+        public ISocketMessageChannel Channel => _socketMessageComponent.Channel;
+        public ulong? GuildId => _socketMessageComponent.GuildId;
 
         public Task RespondAsync(
             string? text = null,
@@ -38,7 +39,7 @@ namespace DiscordBot.DiscordBot.Commands;
             RequestOptions? options = null)
         {
             // Call the corresponding method of the adapted SocketMessageComponent
-            return SocketMessageComponent.RespondAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
+            return _socketMessageComponent.RespondAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
         }
 
         /// <inheritdoc/>
@@ -53,14 +54,14 @@ namespace DiscordBot.DiscordBot.Commands;
             RequestOptions? options = null)
         {
             // Call the corresponding method of the adapted SocketMessageComponent
-            return SocketMessageComponent.FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
+            return _socketMessageComponent.FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
         }
 
         /// <inheritdoc/>
         public Task DeferAsync(bool ephemeral = false, RequestOptions? options = null)
         {
             // Call the corresponding method of the adapted SocketMessageComponent
-            return SocketMessageComponent.DeferAsync(ephemeral, options);
+            return _socketMessageComponent.DeferAsync(ephemeral, options);
         }
 
         /// <summary>
@@ -69,5 +70,5 @@ namespace DiscordBot.DiscordBot.Commands;
         /// <returns></returns>
         public bool ValidateCommand() => true;
 
-        public string? GetCommandName() => SocketMessageComponent.Data?.CustomId;
+        public string? GetCommandName() => _socketMessageComponent.Data?.CustomId;
     }

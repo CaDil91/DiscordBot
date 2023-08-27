@@ -1,9 +1,9 @@
 ﻿using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using DiscordBot.DiscordBot.Commands;
+using DiscordBot.Controllers.Adapters;
 
-namespace DiscordBot.DiscordBot.Core;
+namespace DiscordBot.Services;
 
 public class DiscordGuildServices
 {

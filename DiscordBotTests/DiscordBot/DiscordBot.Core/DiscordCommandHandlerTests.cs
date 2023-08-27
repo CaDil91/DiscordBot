@@ -1,23 +1,23 @@
-﻿using Discord.WebSocket;
+﻿using DiscordBot.Controllers;
 using DiscordBot.DiscordBot.Core;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SteamServices;
+using SteamServices.Controllers;
 
 namespace DiscordBot.DiscordBot.DiscordBot.Core;
 
 public class DiscordCommandHandlerTests
 {
-    private readonly Mock<ILogger<DiscordCommandHandler>> _loggerMock;
+    private readonly Mock<ILogger<DiscordCommandController>> _loggerMock;
 
-    private readonly DiscordCommandHandler _subjectUnderTest;
+    private readonly DiscordCommandController _subjectUnderTest;
 
     public DiscordCommandHandlerTests()
     {
-        _loggerMock = new Mock<ILogger<DiscordCommandHandler>>();
-        Mock<IStoreService> storeService = new();
+        _loggerMock = new Mock<ILogger<DiscordCommandController>>();
+        Mock<IController> storeService = new();
         
-        _subjectUnderTest = new DiscordCommandHandler(_loggerMock.Object, storeService.Object, new Mock<DiscordButtonController>().Object);
+        _subjectUnderTest = new DiscordCommandController(_loggerMock.Object, storeService.Object, new Mock<DiscordButtonController>().Object);
     }
     
     
@@ -27,7 +27,7 @@ public class DiscordCommandHandlerTests
     {
         // Arrange.
         // Act.
-        await _subjectUnderTest.HandleSlashCommandAsync(null);
+        await _subjectUnderTest.RunSlashCommandAsync(null);
         
         // Assert
         _loggerMock.Verify(

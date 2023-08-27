@@ -1,5 +1,7 @@
 ﻿using Discord.WebSocket;
-using DiscordBot.DiscordBot.Core;
+using DiscordBot.Controllers;
+using DiscordBot.Core;
+using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,10 +17,10 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        services.AddSingleton<IDiscordCommandHandler, DiscordCommandHandler>();
+        services.AddSingleton<ICommandController, DiscordCommandController>();
         services.AddSingleton<DiscordGuildServices>();
         services.AddSingleton<DiscordButtonController>();
-        services.AddSingleton<DiscordBot.Core.DiscordBot>();
+        services.AddSingleton<DiscordBot>();
         
         /*//When working with events that have Cacheable<IMessage, ulong> parameters,
         //you must enable the message cache in your config settings if you plan to use the cached message entity.

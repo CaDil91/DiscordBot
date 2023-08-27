@@ -1,7 +1,8 @@
 ﻿using Discord.WebSocket;
-using DiscordBot.DiscordBot.Commands;
+using DiscordBot.Controllers.Adapters;
+using DiscordBot.Services;
 
-namespace DiscordBot.DiscordBot.Core;
+namespace DiscordBot.Core;
 
 /// <summary>
 /// Handles incoming button presses.

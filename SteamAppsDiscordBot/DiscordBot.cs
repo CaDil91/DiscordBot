@@ -1,44 +1,46 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using DiscordBot.Controllers;
 using Microsoft.Extensions.Options;
 
-namespace DiscordBot.DiscordBot.Core;
+namespace DiscordBot;
 
 public class DiscordBot : IDiscordBot
 {
     private readonly DiscordSocketClient _client;
-    private readonly IDiscordCommandHandler _discordCommandHandler;
+    private readonly ICommandController _discordCommandController;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordCommandHandler discordCommandHandler, DiscordSocketClient discordClient)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, ICommandController discordCommandController, DiscordSocketClient discordClient)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters,
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
         //var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         _client = discordClient;
         _discordOptions = discordOptions;
-        _discordCommandHandler = discordCommandHandler;
+        _discordCommandController = discordCommandController;
     }
 
     public async Task RunAsync()
     {
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
-        
-#if REGISTER_COMMANDS
-        //TODO: move to other project
-        // Commands only need to be registered once ever.
-        await RegisterSlashCommands("steam", _client.Guilds?.FirstOrDefault(), "Search the steam store");
-        return; //Do not stay connected
-#endif
 
         // Add listeners.
-        _client.SlashCommandExecuted += _discordCommandHandler.HandleSlashCommandAsync;
-        _client.ButtonExecuted += _discordCommandHandler.HandleButtonCommandAsync;
+        _client.SlashCommandExecuted += _discordCommandController.RunSlashCommandAsync;
+        _client.ButtonExecuted += _discordCommandController.HandleButtonCommandAsync;
 
         await Task.Delay(Timeout.Infinite); // Block this task until the program is closed.
     }
 
+    
+        
+/*#if REGISTER_COMMANDS
+        //TODO: move
+        // Commands only need to be registered once ever.
+        await RegisterSlashCommands("steam", _client.Guilds?.FirstOrDefault(), "Search the steam store");
+        return; //Do not stay connected
+#endif
     /// <summary>
     /// Register slash commands.
     /// </summary>
@@ -66,5 +68,5 @@ public class DiscordBot : IDiscordBot
     /// Check if DiscordBotSocketClient.ConnectionState.Connected == True.
     /// </summary>
     /// <returns>bool</returns>
-    public bool IsConnected() => _client.ConnectionState == ConnectionState.Connected;
+    public bool IsConnected() => _client.ConnectionState == ConnectionState.Connected;*/
 }

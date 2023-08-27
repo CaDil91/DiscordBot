@@ -19,7 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Databases\" />
         <Folder Include="obj\Debug\net6.0" />
+        <Folder Include="Services\DTOs\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,7 +41,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AzureServices\AzureServices.csproj" />
-        <ProjectReference Include="..\SteamServices\SteamServices.csproj" />
+        <ProjectReference Include="..\SteamStoreApi\SteamStoreApi.csproj" />
     </ItemGroup>
 
 </Project>

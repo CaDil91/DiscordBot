@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using DiscordBot.DiscordBot.Core;
+using DiscordBot.Controllers;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -8,14 +8,14 @@ namespace DiscordBot.DiscordBot.DiscordBot.Core;
 public class DiscordBotTests
 {
     private readonly Mock<IOptions<DiscordBotOptions>> _optionsMock;
-    private readonly Mock<IDiscordCommandHandler> _discordCommandHandler;
+    private readonly Mock<ICommandController> _discordCommandHandler;
     private const string TEST_TOKEN = "MTAwMzA3NTcxMzAwNTUzMTIxNg.GsL_2g.7DxQHrpK31n1Bz6OxRYyMjl3xQD6U9Vvbowbuo";
 
     private global::DiscordBot.DiscordBot.Core.DiscordBot _subjectUnderTest;
 
     public DiscordBotTests()
     {
-        _discordCommandHandler = new Mock<IDiscordCommandHandler>();
+        _discordCommandHandler = new Mock<ICommandController>();
         _optionsMock = new Mock<IOptions<DiscordBotOptions>>();
 
         _subjectUnderTest = new global::DiscordBot.DiscordBot.Core.DiscordBot(_optionsMock.Object,

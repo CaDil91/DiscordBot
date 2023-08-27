@@ -4,6 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>SteamServices</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +21,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GoogleServices\GoogleServices.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\Data.Requests\" />
+      <Folder Include="Services\DTOs\" />
     </ItemGroup>
 
 </Project>
