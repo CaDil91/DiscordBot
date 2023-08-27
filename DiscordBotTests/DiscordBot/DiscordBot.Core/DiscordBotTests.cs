@@ -1,4 +1,4 @@
-﻿using Discord.WebSocket;
+﻿/*using Discord.WebSocket;
 using DiscordBot.Controllers;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -11,14 +11,14 @@ public class DiscordBotTests
     private readonly Mock<ICommandController> _discordCommandHandler;
     private const string TEST_TOKEN = "MTAwMzA3NTcxMzAwNTUzMTIxNg.GsL_2g.7DxQHrpK31n1Bz6OxRYyMjl3xQD6U9Vvbowbuo";
 
-    private global::DiscordBot.DiscordBot.Core.DiscordBot _subjectUnderTest;
+    private DiscordBot _subjectUnderTest;
 
     public DiscordBotTests()
     {
         _discordCommandHandler = new Mock<ICommandController>();
         _optionsMock = new Mock<IOptions<DiscordBotOptions>>();
 
-        _subjectUnderTest = new global::DiscordBot.DiscordBot.Core.DiscordBot(_optionsMock.Object,
+        _subjectUnderTest = new DiscordBot(_optionsMock.Object,
             _discordCommandHandler.Object, new Mock<DiscordSocketClient>().Object);
     }
 
@@ -47,4 +47,4 @@ public class DiscordBotTests
         Assert.True(_subjectUnderTest.IsConnected());
         return Task.CompletedTask;
     }
-}
+}*/

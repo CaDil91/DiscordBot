@@ -1,15 +1,12 @@
 ﻿using Discord;
-using Discord.WebSocket;
-using DiscordBot.Controllers.Adapters;
 using DiscordBot.Services;
-using DiscordBot.Services.Commands;
 using DiscordBot.Services.Commands.Factory;
 using Microsoft.Extensions.Logging;
 using SteamServices;
 
 namespace DiscordBot.Controllers;
 
-public class DiscordCommandController : ICommandController
+public class DiscordCommandController
 {
     private readonly ILogger<DiscordCommandController> _logger;
     private readonly ICommandFactory _commandFactory;
@@ -22,7 +19,7 @@ public class DiscordCommandController : ICommandController
         _commandFactory = commandFactory;
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Verify SocketSlashCommand and send to wrapper/adapter.
     /// SocketSlashCommand is difficult to mock for unit testing. All private.
     /// </summary>
@@ -30,7 +27,7 @@ public class DiscordCommandController : ICommandController
     public async Task RunSlashCommandAsync(SocketSlashCommand socketSlashCommand)
     {
         // Validate
-        if(!TryGetCommandAdapter(socketSlashCommand, out ICommandAdapter? commandAdapter) || commandAdapter == null)
+        if(!TryGetCommandAdapter(socketSlashCommand, out ICommandAdapter<>? commandAdapter) || commandAdapter == null)
         {
             _logger.LogError("Invalid slash command received.");
             return;
@@ -43,7 +40,7 @@ public class DiscordCommandController : ICommandController
         
         // Respond
         /*foreach (DiscordResponse response in command.DiscordResponses) 
-            await command.RespondAsync(response);*/
+            await command.RespondAsync(response);#1#
     }
 
     public async Task HandleButtonCommandAsync(SocketMessageComponent socketMessageComponent)
@@ -62,7 +59,7 @@ public class DiscordCommandController : ICommandController
         
         // Respond
         /*foreach (DiscordResponse response in command.DiscordResponses)
-            await command.RespondAsync(response);*/
+            await command.RespondAsync(response);#1#
     }
     
     
@@ -88,6 +85,7 @@ public class DiscordCommandController : ICommandController
         }
         return true;
     }
+    */
 
     /*/// <summary>
     /// 

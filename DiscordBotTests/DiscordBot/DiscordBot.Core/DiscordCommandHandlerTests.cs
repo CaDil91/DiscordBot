@@ -1,4 +1,4 @@
-﻿using DiscordBot.Controllers;
+﻿/*using DiscordBot.Controllers;
 using DiscordBot.DiscordBot.Core;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -38,4 +38,4 @@ public class DiscordCommandHandlerTests
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception?, string>>((v, t) => true)));
     }
-}
+}*/

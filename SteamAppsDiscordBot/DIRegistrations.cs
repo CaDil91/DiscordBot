@@ -17,7 +17,7 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        services.AddSingleton<ICommandController, DiscordCommandController>();
+        //services.AddSingleton<ICommandController, DiscordCommandController>();
         services.AddSingleton<DiscordGuildServices>();
         services.AddSingleton<DiscordButtonController>();
         services.AddSingleton<DiscordBot>();
