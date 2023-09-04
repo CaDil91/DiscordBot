@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace DiscordBot.Services;
+namespace DiscordBot.Services.DTO;
 
 /// <summary>
 /// Holds components for a Discord.Net response.

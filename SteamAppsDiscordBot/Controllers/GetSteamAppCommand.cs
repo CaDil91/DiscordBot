@@ -1,7 +1,7 @@
 ﻿using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Commands;
+namespace DiscordBot.Controllers;
 
 /// <summary>
 /// Command modules are transient objects.

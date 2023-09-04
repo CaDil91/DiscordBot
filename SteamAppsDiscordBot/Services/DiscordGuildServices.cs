@@ -1,7 +1,5 @@
 ﻿using Discord;
-using Discord.Rest;
 using Discord.WebSocket;
-using DiscordBot.Controllers.Adapters;
 
 namespace DiscordBot.Services;
 
@@ -13,19 +11,19 @@ public class DiscordGuildServices
     {
         _client = client;
     }
-    
+
     /// <summary>
     /// Get message from embed attacked to a SocketMessageComponentAdapter.
     /// </summary>
-    /// <param name="socketMessageComponentAdapter">SocketMessageComponentAdapter</param>
+    /// <param name="message"></param>
     /// <returns>Null on failure</returns>
-    public static async Task<string?> GetEmbedTitleAsync(SocketMessageComponentAdapter socketMessageComponentAdapter)
+    public static string? GetEmbedTitleAsync(IMessage? message)
     {
-        IMessage message = await socketMessageComponentAdapter.Channel.GetMessageAsync(socketMessageComponentAdapter.Message.Id);
+        //IMessage message = await socketMessageComponentAdapter.Channel.GetMessageAsync(socketMessageComponentAdapter.Message.Id);
         return message == null && message?.Embeds == null ? string.Empty : message.Embeds.FirstOrDefault()?.Title;
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Get role from socketMessageComponentAdapter's guild.
     /// </summary>
     /// <param name="socketMessageComponentAdapter">Used in some discord commands, like buttons presses</param>
@@ -112,7 +110,7 @@ public class DiscordGuildServices
 
         SocketGuild? guild = _client.GetGuild(guildId.Value);
         return (guild == null) ? guild : null;
-    }
+    }*/
 
     
 }
