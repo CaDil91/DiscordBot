@@ -10,4 +10,4 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
 var discordBot = host.Services.GetRequiredService<DiscordBot.DiscordBot>();
 
-await discordBot.RunAsync();
+await discordBot.RunAsync(host.Services);

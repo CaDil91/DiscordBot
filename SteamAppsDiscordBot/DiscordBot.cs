@@ -1,6 +1,7 @@
-﻿using Discord;
+﻿using System.Reflection;
+using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
-using DiscordBot.Controllers;
 using Microsoft.Extensions.Options;
 
 namespace DiscordBot;
@@ -8,34 +9,50 @@ namespace DiscordBot;
 public class DiscordBot : IDiscordBot
 {
     private readonly DiscordSocketClient _client;
-    private readonly ICommandController _discordCommandController;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, ICommandController discordCommandController, DiscordSocketClient discordClient)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, DiscordSocketClient discordClient)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters,
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
         //var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         _client = discordClient;
         _discordOptions = discordOptions;
-        _discordCommandController = discordCommandController;
     }
 
-    public async Task RunAsync()
+    public async Task RunAsync(IServiceProvider serviceProvider)
     {
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
+        await SetupInteractionService(serviceProvider);
+        
+        //_client.ButtonExecuted += _discordCommandController.HandleButtonCommandAsync;
 
-        // Add listeners.
-        _client.SlashCommandExecuted += _discordCommandController.RunSlashCommandAsync;
-        _client.ButtonExecuted += _discordCommandController.HandleButtonCommandAsync;
-
-        await Task.Delay(Timeout.Infinite); // Block this task until the program is closed.
+        // Block this task until the program is closed.
+        await Task.Delay(Timeout.Infinite);
     }
 
-    
+    /// <summary>
+    /// Create a service provider for Discord.net's interactionService.
+    /// The interaction service handles incoming commands, and calls the appropriate module.
+    /// </summary>
+    /// <param name="serviceProvider"></param>
+    /// <returns></returns>
+    private async Task SetupInteractionService(IServiceProvider serviceProvider)
+    {
+        var interactionService = new InteractionService(_client.Rest);
+        await interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
         
-/*#if REGISTER_COMMANDS
+        // Add listeners.
+        _client.SlashCommandExecuted += async (interaction) =>
+        {
+            var socketInteractionContext = new SocketInteractionContext<SocketSlashCommand>(_client, interaction);
+            await interactionService.ExecuteCommandAsync(socketInteractionContext, serviceProvider);
+        };
+    }
+
+
+    /*#if REGISTER_COMMANDS
         //TODO: move
         // Commands only need to be registered once ever.
         await RegisterSlashCommands("steam", _client.Guilds?.FirstOrDefault(), "Search the steam store");

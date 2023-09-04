@@ -2,5 +2,5 @@
 
 public interface IDiscordBot
 {
-    public Task RunAsync();
+    public Task RunAsync(IServiceProvider serviceProvider);
 }

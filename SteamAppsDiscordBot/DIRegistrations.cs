@@ -1,6 +1,4 @@
 ﻿using Discord.WebSocket;
-using DiscordBot.Controllers;
-using DiscordBot.Core;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +15,7 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        //services.AddSingleton<ICommandController, DiscordCommandController>();
         services.AddSingleton<DiscordGuildServices>();
-        services.AddSingleton<DiscordButtonController>();
         services.AddSingleton<DiscordBot>();
         
         /*//When working with events that have Cacheable<IMessage, ulong> parameters,
