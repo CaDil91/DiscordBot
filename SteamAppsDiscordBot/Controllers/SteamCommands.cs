@@ -16,11 +16,11 @@ namespace DiscordBot.Controllers;
 /// 
 /// - More info: https://discordnet.dev/guides/int_framework/intro.html
 /// </summary>
-public class GetSteamAppCommand : InteractionModuleBase //Command modules are transient objects.
+public class SteamCommands : InteractionModuleBase //Command modules are transient objects.
 {
-    private readonly ILogger<GetSteamAppCommand> _logger;
+    private readonly ILogger<SteamCommands> _logger;
 
-    public GetSteamAppCommand(ILogger<GetSteamAppCommand> logger)
+    public SteamCommands(ILogger<SteamCommands> logger)
     {
         _logger = logger;
     }
