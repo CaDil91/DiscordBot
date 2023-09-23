@@ -9,7 +9,7 @@ namespace SteamServices;
 public static class DIRegistrations
 {
     /// <summary>
-    ///     DI container IServiceCollection extension method to register SteamStoreApi dependencies and settings.
+    ///     DI container IServiceCollection extension method to register SteamStoreServices dependencies and settings.
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
