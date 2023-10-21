@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SteamServices.Controllers;
 using SteamServices.Repositories;
+using SteamServices.Services;
 
 namespace SteamServices;
 
 public static class DIRegistrations
 {
     /// <summary>
-    ///     DI container IServiceCollection extension method to register SteamStoreServices dependencies and settings.
+    ///     DI container IServiceCollection extension method to register SteamServices dependencies and settings.
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
@@ -18,7 +18,7 @@ public static class DIRegistrations
         services.AddHttpClient("hardcodedsteam");
         services.AddDbContext<SteamNewsDatabaseContext>(options => 
             options.UseSqlServer(Environment.GetEnvironmentVariable("SteamNewsDbConnectionString")!));
-        services.AddSingleton<IController, SteamStoreController>();
+        services.AddSingleton<SteamStoreService>();
         
         services.AddOptions<SteamOptions>()
             .Configure<IConfiguration>((options, configuration) =>

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SteamServices.MySteamDatabase;
+namespace SteamServices.Repositories;
 
 public class Webhook
 {

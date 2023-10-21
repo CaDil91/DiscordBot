@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using SteamServices;
-using SteamServices.Controllers;
+using SteamServices.Services;
 
 namespace DiscordBot.SteamServices;
 
@@ -47,7 +47,7 @@ public class DIRegistrationTests
         // Act.
 
         // Assert.
-        Assert.Contains(_subjectUnderTest, x => x.ServiceType == typeof(IController));
+        Assert.Contains(_subjectUnderTest, x => x.ServiceType == typeof(SteamStoreService));
     }
     
     // Test that SteamOptions is registered.

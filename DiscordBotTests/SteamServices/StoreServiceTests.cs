@@ -3,14 +3,14 @@ using GoogleService;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
-using SteamServices;
-using SteamServices.Controllers;
+using SteamServices.DTOs;
+using SteamServices.Services;
 
 namespace DiscordBot.SteamServices;
 
 public class SteamServicesStoreServiceTests
 {
-    private readonly SteamStoreController _subjectUnderTest;
+    private readonly SteamStoreService _subjectUnderTest;
 
     private List<Uri> _mockedGoogleSearchRepositorySearchResults;
     private HttpResponseMessage _mockedHttpClientResponseMessage;
@@ -35,14 +35,14 @@ public class SteamServicesStoreServiceTests
         Mock<IHttpClientFactory> httpClientFactoryMock = new();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        Mock<ILogger<SteamStoreController>> loggerMock = new();
+        Mock<ILogger<SteamStoreService>> loggerMock = new();
 
         Mock<IGoogleSearchRepository> googleSearchRepositoryMock = new();
         googleSearchRepositoryMock.Setup(_ => _.GetCustomSearchResultsAsync(It.IsAny<string>(), It.IsAny<int>()))
             .ReturnsAsync(() => _mockedGoogleSearchRepositorySearchResults);
 
         // Create subject under test.
-        _subjectUnderTest = new SteamStoreController(httpClientFactoryMock.Object, loggerMock.Object,
+        _subjectUnderTest = new SteamStoreService(httpClientFactoryMock.Object, loggerMock.Object,
             googleSearchRepositoryMock.Object);
     }
 

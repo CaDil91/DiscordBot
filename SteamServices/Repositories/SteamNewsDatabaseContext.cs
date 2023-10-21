@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SteamServices.MySteamDatabase;
 
 namespace SteamServices.Repositories;
 public sealed class SteamNewsDatabaseContext : DbContext

@@ -1,13 +1,14 @@
 ﻿using GoogleService;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SteamServices.DTOs;
 
-namespace SteamServices.Controllers;
+namespace SteamServices.Services;
 
-public class SteamStoreController : IController
+public class SteamStoreService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<SteamStoreController> _logger;
+    private readonly ILogger<SteamStoreService> _logger;
     private readonly IGoogleSearchRepository _steamStoreRepository;
 
     /// <summary>
@@ -16,7 +17,7 @@ public class SteamStoreController : IController
     /// <param name="logger"></param>
     /// <param name="httpClientFactory"></param>
     /// <param name="steamStoreRepository"></param>
-    public SteamStoreController(IHttpClientFactory httpClientFactory, ILogger<SteamStoreController> logger, IGoogleSearchRepository steamStoreRepository)
+    public SteamStoreService(IHttpClientFactory httpClientFactory, ILogger<SteamStoreService> logger, IGoogleSearchRepository steamStoreRepository)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
         _logger = logger;
