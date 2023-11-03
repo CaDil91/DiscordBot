@@ -5,7 +5,7 @@ using Moq;
 
 namespace DiscordBot.DiscordBot.DiscordBot.Core;
 
-public class DiscordBotTests
+public class SteamAppsDiscordBotTests
 {
     private readonly Mock<IOptions<DiscordBotOptions>> _optionsMock;
     private readonly Mock<ICommandController> _discordCommandHandler;
@@ -13,7 +13,7 @@ public class DiscordBotTests
 
     private DiscordBot _subjectUnderTest;
 
-    public DiscordBotTests()
+    public SteamAppsDiscordBotTests()
     {
         _discordCommandHandler = new Mock<ICommandController>();
         _optionsMock = new Mock<IOptions<DiscordBotOptions>>();

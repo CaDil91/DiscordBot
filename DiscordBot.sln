@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBotTests", "DiscordBotTests\DiscordBotTests.csproj", "{B5BAAE92-59EC-40CE-B672-D204EEA33210}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamAppsDiscordBotTests", "SteamAppsDiscordBotTests\SteamAppsDiscordBotTests.csproj", "{B5BAAE92-59EC-40CE-B672-D204EEA33210}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureServices", "AzureServices\AzureServices.csproj", "{9BCDC0F1-D5F6-4971-8CA8-72D0E78EB8A2}"
 EndProject
