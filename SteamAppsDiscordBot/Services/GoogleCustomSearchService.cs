@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace GoogleService;
+namespace DiscordBot.Services;
 
 public class GoogleCustomSearchService : IGoogleSearchRepository
 {

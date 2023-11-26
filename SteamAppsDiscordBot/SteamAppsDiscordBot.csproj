@@ -11,6 +11,8 @@
     <ItemGroup>
         <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.5.0" />
         <PackageReference Include="Discord.Net" Version="3.10.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
@@ -36,11 +38,6 @@
         <None Update="appsettings.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\AzureServices\AzureServices.csproj" />
-        <ProjectReference Include="..\SteamServices\SteamServices.csproj" />
     </ItemGroup>
 
 </Project>

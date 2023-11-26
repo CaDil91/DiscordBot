@@ -1,5 +1,7 @@
 ﻿using Discord.WebSocket;
+using DiscordBot.Repositories;
 using DiscordBot.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,6 +34,40 @@ public static class DIRegistrations
                 configuration.GetSection(DiscordBotOptions.SECTION_NAME).Bind(options);
             });
 
+        return services;
+    }
+    
+    /// <summary>
+    ///     DI container IServiceCollection extension method to register SteamServices dependencies and settings.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static IServiceCollection RegisterSteamServices(this IServiceCollection services)
+    {
+        services.AddHttpClient("hardcodedsteam");
+        services.AddDbContext<SteamNewsDatabaseContext>(options => 
+            options.UseSqlServer(Environment.GetEnvironmentVariable("SteamNewsDbConnectionString")!));
+        services.AddSingleton<SteamStoreServices>();
+        
+        services.AddOptions<SteamOptions>()
+            .Configure<IConfiguration>((options, configuration) =>
+            {
+                configuration.GetSection(SteamOptions.SECTION_NAME).Bind(options);
+            });
+        
+        return services;
+    }
+    
+    public static IServiceCollection RegisterGoogleServices(this IServiceCollection services)
+    {
+        //change
+        services.AddHttpClient("hardcodedgoogle", client => { client.BaseAddress = new Uri("https://www.googleapis.com/customsearch/v1"); });
+        services.AddSingleton<IGoogleSearchRepository, GoogleCustomSearchService>();
+        services.AddOptions<GoogleOptions>()
+            .Configure<IConfiguration>((options, configuration) =>
+            {
+                configuration.GetSection(GoogleOptions.SECTION_NAME).Bind(options);
+            });
         return services;
     }
 }

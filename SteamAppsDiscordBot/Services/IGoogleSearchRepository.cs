@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace GoogleService;
+namespace DiscordBot.Services;
 
 public interface IGoogleSearchRepository
 {

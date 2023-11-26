@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
+using DiscordBot.Services;
+using DiscordBot.Services.DTO;
 using Microsoft.Extensions.Logging;
-using SteamServices.DTOs;
-using SteamServices.Services;
 
 namespace DiscordBot.Modules;
 
@@ -22,14 +22,14 @@ namespace DiscordBot.Modules;
 public class SteamCommands : InteractionModuleBase //InteractionModuleBase "modules/commands" are transient objects.
 {
     private readonly ILogger<SteamCommands> _logger;
-    private readonly SteamStoreService _steamStoreService;
+    private readonly ISteamStoreService _steamStoreServices;
     private const string STEAM_FOLLOW_CUSTOM_ID = "Steam_Follow";
     private const string STEAM_UNFOLLOW_CUSTOM_ID = "Steam_Unfollow";
 
-    public SteamCommands(ILogger<SteamCommands> logger, SteamStoreService steamStoreService)
+    public SteamCommands(ILogger<SteamCommands> logger, ISteamStoreService steamStoreServices)
     {
         _logger = logger;
-        _steamStoreService = steamStoreService;
+        _steamStoreServices = steamStoreServices;
     }
 
     /// <summary>
@@ -40,30 +40,46 @@ public class SteamCommands : InteractionModuleBase //InteractionModuleBase "modu
     public async Task GetSteamAppAsync(string appName)
     {
         // Defer the response to avoid the "Thinking..." state
-        await DeferAsync();
+        await DeferAsyncCaller();
 
-        // Get the first result
-        List<SteamApp> steamApps = await _steamStoreService.GetAppsAsync(appName, 1);
+        // Get the first result only.
+        List<SteamApp> steamApps = await _steamStoreServices.GetAppsAsync(appName, 1);
         if (steamApps.Count == 0)
         {
-            await FollowupAsync("No results found.");
+            await FollowupAsyncCaller("No results found.");
             return;
         }
         SteamApp steamApp = steamApps.First();
         
-        // Get the embed
-        Embed? embed = GetEmbed(steamApp);
+        // Get the embed.
+        Embed? embed = CreateEmbed(steamApp);
         if (embed == null)
         {
-            await FollowupAsync("No results found.");
+            await FollowupAsyncCaller("No results found.");
             return;
         }
         
-        // Get the component
+        // Get the component.
         MessageComponent component = GetFollowUnfollowComponent();
         
-        // Send the response
-        await FollowupAsync("", embeds: new[] { embed }, components: component);
+        // Send the response.
+        await FollowupAsyncCaller("", embeds: new[] { embed }, components: component);
+    }
+
+    /// <summary>
+    /// Wrapper for DeferAsync().
+    /// Created for mocking in unit tests.
+    /// </summary>
+    private async Task DeferAsyncCaller()
+    {
+        try
+        {
+            await DeferAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "Unable to defer response");
+        }
     }
 
     /// <summary>
@@ -94,7 +110,7 @@ public class SteamCommands : InteractionModuleBase //InteractionModuleBase "modu
     /// </summary>
     /// <param name="steamApp"></param>
     /// <returns></returns>
-    private static Embed? GetEmbed(SteamApp steamApp)
+    private static Embed? CreateEmbed(SteamApp steamApp)
     {
         Embed? embed = new EmbedBuilder()
             .WithTitle(steamApp.Name)
@@ -103,5 +119,32 @@ public class SteamCommands : InteractionModuleBase //InteractionModuleBase "modu
             .WithImageUrl(steamApp.HeaderImage)
             .Build();
         return embed;
+    }
+
+
+    /// <summary>
+    /// Wrapper for FollowupAsync().
+    /// Created for mocking in unit tests.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="embeds"></param>
+    /// <param name="isTTS"></param>
+    /// <param name="ephemeral"></param>
+    /// <param name="allowedMentions"></param>
+    /// <param name="options"></param>
+    /// <param name="components"></param>
+    /// <returns></returns>
+    public async Task FollowupAsyncCaller(string message, Embed[]? embeds = null, bool isTTS = false, 
+        bool ephemeral = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null, 
+        MessageComponent? components = null)
+    {
+        try
+        {
+            await FollowupAsync(message, embeds, isTTS, ephemeral, allowedMentions, options, components);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "Unable to send followup message");
+        }
     }
 }

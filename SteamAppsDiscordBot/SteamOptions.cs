@@ -1,4 +1,4 @@
-namespace SteamServices;
+namespace DiscordBot;
 
 public class SteamOptions
 {

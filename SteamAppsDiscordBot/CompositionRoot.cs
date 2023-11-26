@@ -1,7 +1,4 @@
-﻿using AzureServices;
-using GoogleService;
-using Microsoft.Extensions.DependencyInjection;
-using SteamServices;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot;
 
@@ -11,7 +8,6 @@ public static class CompositionRoot
     {
         services.RegisterDiscordBot();
         services.RegisterSteamServices();
-        services.RegisterAzureServices();
         services.RegisterGoogleServices();
         
         return services;

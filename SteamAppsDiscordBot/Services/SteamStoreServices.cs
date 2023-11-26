@@ -1,14 +1,13 @@
-﻿using GoogleService;
+﻿using DiscordBot.Services.DTO;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using SteamServices.DTOs;
 
-namespace SteamServices.Services;
+namespace DiscordBot.Services;
 
-public class SteamStoreService
+public class SteamStoreServices : ISteamStoreService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<SteamStoreService> _logger;
+    private readonly ILogger<SteamStoreServices> _logger;
     private readonly IGoogleSearchRepository _steamStoreRepository;
 
     /// <summary>
@@ -17,7 +16,7 @@ public class SteamStoreService
     /// <param name="logger"></param>
     /// <param name="httpClientFactory"></param>
     /// <param name="steamStoreRepository"></param>
-    public SteamStoreService(IHttpClientFactory httpClientFactory, ILogger<SteamStoreService> logger, IGoogleSearchRepository steamStoreRepository)
+    public SteamStoreServices(IHttpClientFactory httpClientFactory, ILogger<SteamStoreServices> logger, IGoogleSearchRepository steamStoreRepository)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
         _logger = logger;

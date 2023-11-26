@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SteamServices.Repositories;
+namespace DiscordBot.Repositories;
 
 public class FollowedSteamApp
 {

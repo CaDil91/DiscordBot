@@ -1,4 +1,4 @@
-﻿namespace GoogleService;
+﻿namespace DiscordBot;
 
 public class GoogleOptions
 {

@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using GoogleService;
+using DiscordBot.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

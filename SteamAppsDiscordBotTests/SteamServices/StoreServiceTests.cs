@@ -1,16 +1,15 @@
 ﻿using System.Net;
-using GoogleService;
+using DiscordBot.Services;
+using DiscordBot.Services.DTO;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
-using SteamServices.DTOs;
-using SteamServices.Services;
 
 namespace DiscordBot.SteamServices;
 
 public class SteamServicesStoreServiceTests
 {
-    private readonly SteamStoreService _subjectUnderTest;
+    private readonly SteamStoreServices _subjectUnderTest;
 
     private List<Uri> _mockedGoogleSearchRepositorySearchResults;
     private HttpResponseMessage _mockedHttpClientResponseMessage;
@@ -35,14 +34,13 @@ public class SteamServicesStoreServiceTests
         Mock<IHttpClientFactory> httpClientFactoryMock = new();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        Mock<ILogger<SteamStoreService>> loggerMock = new();
+        Mock<ILogger<SteamStoreServices>> loggerMock = new();
 
         Mock<IGoogleSearchRepository> googleSearchRepositoryMock = new();
-        googleSearchRepositoryMock.Setup(_ => _.GetCustomSearchResultsAsync(It.IsAny<string>(), It.IsAny<int>()))
-            .ReturnsAsync(() => _mockedGoogleSearchRepositorySearchResults);
+        googleSearchRepositoryMock.Setup(_ => _.GetCustomSearchResultsAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(() => _mockedGoogleSearchRepositorySearchResults);
 
         // Create subject under test.
-        _subjectUnderTest = new SteamStoreService(httpClientFactoryMock.Object, loggerMock.Object,
+        _subjectUnderTest = new SteamStoreServices(httpClientFactoryMock.Object, loggerMock.Object,
             googleSearchRepositoryMock.Object);
     }
 
