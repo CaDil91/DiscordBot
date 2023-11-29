@@ -9,6 +9,6 @@ public interface IDiscordSocketClientAdapter
     DiscordSocketRestClient Rest { get; }
     event Func<SocketSlashCommand, Task>? SlashCommandExecuted;
     
-    public Task LoginAsync(TokenType tokenType, string token, bool validateToken = true);
+    public Task LoginAsync(TokenType tokenType, string? token, bool validateToken = true);
     public Task StartAsync();
 }

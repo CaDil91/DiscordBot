@@ -28,7 +28,7 @@ public class DiscordSocketClientAdapter : IDiscordSocketClientAdapter
     /// <param name="tokenType"></param>
     /// <param name="token"></param>
     /// <param name="validateToken"></param>
-    public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true) => 
+    public async Task LoginAsync(TokenType tokenType, string? token, bool validateToken = true) => 
         await DiscordSocketClient.LoginAsync(tokenType, token, validateToken);
 
     /// <summary>

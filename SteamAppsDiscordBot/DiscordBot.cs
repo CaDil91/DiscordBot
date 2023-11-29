@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
