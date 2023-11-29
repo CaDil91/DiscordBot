@@ -8,10 +8,10 @@ namespace DiscordBot;
 
 public class DiscordBot : IDiscordBot
 {
-    private readonly DiscordSocketClient _client;
+    private readonly IDiscordSocketClientAdapter _client;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, DiscordSocketClient discordClient)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordSocketClientAdapter discordClient)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters,
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
@@ -46,7 +46,7 @@ public class DiscordBot : IDiscordBot
         // Add listeners.
         _client.SlashCommandExecuted += async (interaction) =>
         {
-            var socketInteractionContext = new SocketInteractionContext<SocketSlashCommand>(_client, interaction);
+            var socketInteractionContext = new SocketInteractionContext<SocketSlashCommand>(_client.DiscordSocketClient, interaction);
             await interactionService.ExecuteCommandAsync(socketInteractionContext, serviceProvider);
         };
     }

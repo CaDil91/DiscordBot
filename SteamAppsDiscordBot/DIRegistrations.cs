@@ -24,7 +24,7 @@ public static class DIRegistrations
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
         var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         var client = new DiscordSocketClient(discordSocketConfig);*/
-        services.AddSingleton<DiscordSocketClient>();
+        services.AddSingleton<IDiscordSocketClientAdapter>(_ => new DiscordSocketClientAdapter(new DiscordSocketClient()));
         
         services.AddLogging(x => x.AddConsole());
 
