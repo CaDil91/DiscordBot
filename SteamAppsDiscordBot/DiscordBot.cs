@@ -21,7 +21,7 @@ public class DiscordBot : IDiscordBot
         _discordOptions = discordOptions;
     }
 
-    public async Task RunAsync(IServiceProvider serviceProvider)
+    public async Task RunAsync(IServiceProvider serviceProvider, int timeout = Timeout.Infinite)
     {
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
@@ -30,7 +30,7 @@ public class DiscordBot : IDiscordBot
         //_client.ButtonExecuted += _discordCommandController.HandleButtonCommandAsync;
 
         // Block this task until the program is closed.
-        await Task.Delay(Timeout.Infinite);
+        await Task.Delay(timeout);
     }
 
     /// <summary>
