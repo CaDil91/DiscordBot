@@ -11,18 +11,33 @@ public class DiscordBot : IDiscordBot
 {
     private readonly IDiscordSocketClientAdapter _client;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IInteractionServiceAdapter _interactionService;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordSocketClientAdapter discordClient)
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordSocketClientAdapter discordClient, 
+        IServiceProvider serviceProvider)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters,
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
         //var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         _client = discordClient;
         _discordOptions = discordOptions;
+        _serviceProvider = serviceProvider;
+        _interactionService = new InteractionServiceAdapter(_client.Rest);
+    }
+    
+    // Overloaded constructor for testing purposes to allow injection of InteractionService mock
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordSocketClientAdapter discordClient, 
+        IServiceProvider serviceProvider, IInteractionServiceAdapter interactionService) 
+        : this(discordOptions, discordClient, serviceProvider)
+    {
+        _interactionService = interactionService;
     }
 
     public async Task RunAsync(IServiceProvider serviceProvider, int timeout = Timeout.Infinite)
     {
+        await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly() ?? throw new InvalidOperationException(), _serviceProvider);
+        
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
         await SetupInteractionService(serviceProvider);
