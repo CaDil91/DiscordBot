@@ -34,37 +34,43 @@ public class DiscordBot : IDiscordBot
         _interactionService = interactionService;
     }
 
-    public async Task RunAsync(IServiceProvider serviceProvider, int timeout = Timeout.Infinite)
+    public async Task RunAsync(int timeout = Timeout.Infinite)
     {
         await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly() ?? throw new InvalidOperationException(), _serviceProvider);
         
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
-        await SetupInteractionService(serviceProvider);
-        
-        //_client.ButtonExecuted += _discordCommandController.HandleButtonCommandAsync;
+        _client.SlashCommandExecuted += OnSlashCommandExecuted;
+        _client.ButtonExecuted += OnButtonExecuted;
 
         // Block this task until the program is closed.
         await Task.Delay(timeout);
     }
-
+    
     /// <summary>
-    /// Create a service provider for Discord.net's interactionService.
-    /// The interaction service handles incoming commands, and calls the appropriate module.
+    /// This method is invoked when a slash command is executed in the discord server. It's responsible for creating
+    /// the interaction context and passing it down for further execution.
     /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <returns></returns>
-    private async Task SetupInteractionService(IServiceProvider serviceProvider)
+    /// <remarks> Excluded from code coverage because this is just an override for SlashCommandExecuted </remarks>
+    /// <param name="interaction">The slash command interaction data from the Discord client.</param>
+    /// <returns>A Task representing the asynchronous operation of the command execution.</returns>
+    [ExcludeFromCodeCoverage]
+    private async Task OnSlashCommandExecuted(SocketSlashCommand interaction)
+    {   
+        var socketInteractionContext = new SocketInteractionContext<SocketSlashCommand>(_client.DiscordSocketClient, interaction);
+        await _interactionService.ExecuteCommandAsync(socketInteractionContext, _serviceProvider);
+    }
+    
+    /// <summary>
+    /// This method is invoked when a button is clicked in the discord server. It's responsible for creating
+    /// the interaction context and passing it down for further execution. 
+    /// </summary>
+    /// <remarks> Excluded from code coverage because this is just an override for SlashCommandExecuted </remarks>
+    /// <param name="interaction"></param>
+    [ExcludeFromCodeCoverage]
+    private async Task OnButtonExecuted(SocketMessageComponent interaction)
     {
-        var interactionService = new InteractionService(_client.Rest);
-        await interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), serviceProvider);
-        
-        // Add listeners.
-        _client.SlashCommandExecuted += async (interaction) =>
-        {
-            var socketInteractionContext = new SocketInteractionContext<SocketSlashCommand>(_client.DiscordSocketClient, interaction);
-            await interactionService.ExecuteCommandAsync(socketInteractionContext, serviceProvider);
-        };
+        await Task.CompletedTask; //TODO: Implement
     }
 
 

@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Diagnostics.CodeAnalysis;
+using Discord;
 using Discord.WebSocket;
 
 namespace DiscordBot;
@@ -6,21 +7,26 @@ namespace DiscordBot;
 /// <summary>
 /// Adapter for DiscordNet's Discord.WebSocket.DiscordSocketClient.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class DiscordSocketClientAdapter : IDiscordSocketClientAdapter
 {
     public DiscordSocketClient DiscordSocketClient { get; }
 
     public DiscordSocketRestClient Rest => DiscordSocketClient.Rest;
     public event Func<SocketSlashCommand, Task>? SlashCommandExecuted;
+    public event Func<SocketMessageComponent, Task>? ButtonExecuted;
 
     public DiscordSocketClientAdapter(DiscordSocketClient client)
     {
         DiscordSocketClient = client;
         DiscordSocketClient.SlashCommandExecuted += client_SlashCommandExecuted;
+        DiscordSocketClient.ButtonExecuted += client_ButtonExecuted;
     }
 
     private Task client_SlashCommandExecuted(SocketSlashCommand arg) => SlashCommandExecuted?.Invoke(arg) 
                                                                         ?? Task.CompletedTask;
+    private Task client_ButtonExecuted(SocketMessageComponent arg) => ButtonExecuted?.Invoke(arg) 
+                                                                      ?? Task.CompletedTask;
 
     /// <summary>
     /// Adapted class has no documentation.

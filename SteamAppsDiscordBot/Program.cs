@@ -17,6 +17,6 @@ internal abstract class Program
 
         var discordBot = host.Services.GetRequiredService<DiscordBot>();
 
-        await discordBot.RunAsync(host.Services);
+        await discordBot.RunAsync();
     }
 }
