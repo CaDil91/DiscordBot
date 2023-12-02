@@ -34,12 +34,24 @@ public class DiscordBot : IDiscordBot
         _interactionService = interactionService;
     }
 
+    
+    /// <summary>
+    /// An asynchronous method that allows the bot to run with support for optional program cancellation after a specific timeout.
+    /// It performs several steps including:
+    /// 1. Adding modules from the entry assembly to the interaction service using the provided service provider.
+    /// 2. Logging into the client with the bot token.
+    /// 3. Starting the client.
+    /// 4. Hooking up handlers for slash command and button execution events.
+    /// 5. Blocking the current task until the given timeout or until the program is closed.
+    /// </summary>
+    /// <param name="timeout">Optional timeout for program cancellation, infinite by default.</param>
     public async Task RunAsync(int timeout = Timeout.Infinite)
     {
         await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly() ?? throw new InvalidOperationException(), _serviceProvider);
         
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
+        
         _client.SlashCommandExecuted += OnSlashCommandExecuted;
         _client.ButtonExecuted += OnButtonExecuted;
 
