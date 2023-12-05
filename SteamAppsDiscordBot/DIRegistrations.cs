@@ -24,7 +24,7 @@ public static class DIRegistrations
         //you must enable the message cache in your config settings if you plan to use the cached message entity.
         var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
         var client = new DiscordSocketClient(discordSocketConfig);*/
-        services.AddSingleton<IDiscordSocketClientAdapter>(_ => new DiscordSocketClientAdapter(new DiscordSocketClient()));
+        services.AddSingleton<DiscordSocketClient>();
         
         services.AddLogging(x => x.AddConsole());
 
@@ -47,7 +47,7 @@ public static class DIRegistrations
         services.AddHttpClient("hardcodedsteam");
         services.AddDbContext<SteamNewsDatabaseContext>(options => 
             options.UseSqlServer(Environment.GetEnvironmentVariable("SteamNewsDbConnectionString")!));
-        services.AddSingleton<SteamStoreServices>();
+        services.AddSingleton<ISteamStoreService, SteamStoreServices>();
         
         services.AddOptions<SteamOptions>()
             .Configure<IConfiguration>((options, configuration) =>

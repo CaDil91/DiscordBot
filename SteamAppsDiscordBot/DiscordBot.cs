@@ -9,12 +9,12 @@ namespace DiscordBot;
 
 public class DiscordBot : IDiscordBot
 {
-    private readonly IDiscordSocketClientAdapter _client;
+    private readonly DiscordSocketClient _client;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IInteractionServiceAdapter _interactionService;
+    private InteractionService _interactionService;
 
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordSocketClientAdapter discordClient, 
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, DiscordSocketClient discordClient, 
         IServiceProvider serviceProvider)
     {
         //When working with events that have Cacheable<IMessage, ulong> parameters,
@@ -23,12 +23,12 @@ public class DiscordBot : IDiscordBot
         _client = discordClient;
         _discordOptions = discordOptions;
         _serviceProvider = serviceProvider;
-        _interactionService = new InteractionServiceAdapter(_client.Rest);
+        _interactionService = new InteractionService(_client.Rest);
     }
     
     // Overloaded constructor for testing purposes to allow injection of InteractionService mock
-    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, IDiscordSocketClientAdapter discordClient, 
-        IServiceProvider serviceProvider, IInteractionServiceAdapter interactionService) 
+    public DiscordBot(IOptions<DiscordBotOptions> discordOptions, DiscordSocketClient discordClient, 
+        IServiceProvider serviceProvider, InteractionService interactionService) 
         : this(discordOptions, discordClient, serviceProvider)
     {
         _interactionService = interactionService;
@@ -47,51 +47,67 @@ public class DiscordBot : IDiscordBot
     /// <param name="timeout">Optional timeout for program cancellation, infinite by default.</param>
     public async Task RunAsync(int timeout = Timeout.Infinite)
     {
+        _client.Ready += ReadyAsync;
+        
         await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly() ?? throw new InvalidOperationException(), _serviceProvider);
+        _client.InteractionCreated += HandleInteraction;
         
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
         await _client.StartAsync();
-        
-        _client.SlashCommandExecuted += OnSlashCommandExecuted;
-        _client.ButtonExecuted += OnButtonExecuted;
 
-        // Block this task until the program is closed.
         await Task.Delay(timeout);
     }
+
+    private async Task ReadyAsync() => await _interactionService.RegisterCommandsGloballyAsync();
     
-    /// <summary>
-    /// This method is invoked when a slash command is executed in the discord server. It's responsible for creating
-    /// the interaction context and passing it down for further execution.
-    /// </summary>
-    /// <remarks> Excluded from code coverage because this is just an override for SlashCommandExecuted </remarks>
-    /// <param name="interaction">The slash command interaction data from the Discord client.</param>
-    /// <returns>A Task representing the asynchronous operation of the command execution.</returns>
-    [ExcludeFromCodeCoverage]
-    private async Task OnSlashCommandExecuted(SocketSlashCommand interaction)
-    {   
-        var socketInteractionContext = new SocketInteractionContext<SocketSlashCommand>(_client.DiscordSocketClient, interaction);
-        await _interactionService.ExecuteCommandAsync(socketInteractionContext, _serviceProvider);
-    }
-    
-    /// <summary>
-    /// This method is invoked when a button is clicked in the discord server. It's responsible for creating
-    /// the interaction context and passing it down for further execution. 
-    /// </summary>
-    /// <remarks> Excluded from code coverage because this is just an override for SlashCommandExecuted </remarks>
-    /// <param name="interaction"></param>
-    [ExcludeFromCodeCoverage]
-    private async Task OnButtonExecuted(SocketMessageComponent interaction)
+    private async Task HandleInteraction(SocketInteraction interaction)
     {
-        await Task.CompletedTask; //TODO: Implement
+        try
+        {
+            // Create an execution context that matches the generic type parameter of your InteractionModuleBase<T> modules.
+            var context = new SocketInteractionContext(_client, interaction);
+
+            // Execute the incoming command.
+            IResult? result = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+
+            if (!result.IsSuccess)
+                switch (result.Error)
+                {
+                    case InteractionCommandError.UnmetPrecondition:
+                        // TODO: implement
+                        break;
+                    case InteractionCommandError.UnknownCommand:
+                        break;
+                    case InteractionCommandError.ConvertFailed:
+                        break;
+                    case InteractionCommandError.BadArgs:
+                        break;
+                    case InteractionCommandError.Exception:
+                        break;
+                    case InteractionCommandError.Unsuccessful:
+                        break;
+                    case InteractionCommandError.ParseFailed:
+                        break;
+                    case null:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+        }
+        catch
+        {
+            // If Slash Command execution fails it is most likely that the original interaction acknowledgement will persist.
+            // It is a good idea to delete the original
+            // response, or at least let the user know that something went wrong during the command execution.
+            if (interaction.Type is InteractionType.ApplicationCommand)
+                await interaction.GetOriginalResponseAsync().ContinueWith(async (msg) => await msg.Result.DeleteAsync());
+        }
     }
 
-
-    /*#if REGISTER_COMMANDS
-        //TODO: move
-        // Commands only need to be registered once ever.
-        await RegisterSlashCommands("steam", _client.Guilds?.FirstOrDefault(), "Search the steam store");
-        return; //Do not stay connected
-#endif
+    /*//TODO: move
+    // Commands only need to be registered once ever.
+    await RegisterSlashCommands("steam", _client.Guilds?.FirstOrDefault(), "Search the Steam store");
+    return; //Do not stay connected*/
     /// <summary>
     /// Register slash commands.
     /// </summary>
@@ -99,9 +115,13 @@ public class DiscordBot : IDiscordBot
     /// <param name="socketGuild"></param>
     /// <param name="sDescription"></param>
     /// <exception>Throws if _client has no guilds</exception>
-    public async Task RegisterSlashCommands(string sName, SocketGuild? socketGuild, string sDescription = "")
+    [ExcludeFromCodeCoverage]
+    private async Task RegisterSlashCommands(string sName, string sDescription = "")
     {
-        Thread.Sleep(6000); //Give time for bot to connect.
+        await Task.Delay(10000); //Give time for bot to connect.
+
+        SocketGuild? socketGuild = _client.Guilds.FirstOrDefault();
+        if (socketGuild == null) throw new Exception("Discord bot is not connected any guilds");
 
         //Create slash commands
         SlashCommandBuilder? guildCommand = new SlashCommandBuilder()
@@ -109,15 +129,7 @@ public class DiscordBot : IDiscordBot
             .WithDescription(sDescription) //Descriptions can have a max length of 100.
             .AddOption("title", ApplicationCommandOptionType.String, "Steam title to search the store for.");
 
-        //Create slash command.
-        if (socketGuild == null) throw new Exception("Discord bot is not connected any guilds");
         
         await socketGuild.CreateApplicationCommandAsync(guildCommand.Build());
     }
-
-    /// <summary>
-    /// Check if DiscordBotSocketClient.ConnectionState.Connected == True.
-    /// </summary>
-    /// <returns>bool</returns>
-    public bool IsConnected() => _client.ConnectionState == ConnectionState.Connected;*/
 }

@@ -19,7 +19,7 @@ namespace DiscordBot.Modules;
 /// 
 /// - More info: https://discordnet.dev/guides/int_framework/intro.html
 /// </summary>
-public class SteamCommands : InteractionModuleBase //InteractionModuleBase "modules/commands" are transient objects.
+public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
 {
     private readonly ILogger<SteamCommands> _logger;
     private readonly ISteamStoreService _steamStoreServices;
@@ -36,7 +36,7 @@ public class SteamCommands : InteractionModuleBase //InteractionModuleBase "modu
     /// This command will be executed when a user types /steam
     /// </summary>
     /// <param name="appName"></param>
-    [SlashCommand("steam", "Search the steam store")]
+    [SlashCommand("steam", "Search the Steam store")]
     public async Task GetSteamAppAsync(string appName)
     {
         // Defer the response to avoid the "Thinking..." state

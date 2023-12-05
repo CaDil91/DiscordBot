@@ -5,10 +5,13 @@ namespace DiscordBot;
 
 public interface IDiscordSocketClientAdapter
 {
-    DiscordSocketClient DiscordSocketClient { get; }
+    DiscordSocketClient DiscordClient { get; }
     DiscordSocketRestClient Rest { get; }
+    IEnumerable<SocketGuild?> Guilds { get; }
+    ConnectionState ConnectionState { get; }
     event Func<SocketSlashCommand, Task>? SlashCommandExecuted;
     event Func<SocketMessageComponent, Task>? ButtonExecuted;
+    public event Func<SocketInteraction, Task>? InteractionCreated;
     
     public Task LoginAsync(TokenType tokenType, string? token, bool validateToken = true);
     public Task StartAsync();

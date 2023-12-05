@@ -11,9 +11,9 @@ public class SteamAppsDiscordBotTests
 {
     private Task _loginResult = Task.CompletedTask;
     private Task _startResult = Task.CompletedTask;
-    private readonly Mock<IDiscordSocketClientAdapter> _clientMock = new();
+    private readonly Mock<DiscordSocketClient> _clientMock = new();
     private readonly Mock<IServiceProvider> _serviceProviderMock = new();
-    private Mock<IInteractionServiceAdapter> _interactionServiceMock = new();
+    private Mock<InteractionService> _interactionServiceMock = new();
     
     private readonly DiscordBot _subjectUnderTest;
 
