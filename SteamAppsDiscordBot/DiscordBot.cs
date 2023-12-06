@@ -12,7 +12,7 @@ public class DiscordBot : IDiscordBot
     private readonly DiscordSocketClient _client;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
     private readonly IServiceProvider _serviceProvider;
-    private InteractionService _interactionService;
+    private readonly InteractionService _interactionService;
 
     public DiscordBot(IOptions<DiscordBotOptions> discordOptions, DiscordSocketClient discordClient, 
         IServiceProvider serviceProvider)
