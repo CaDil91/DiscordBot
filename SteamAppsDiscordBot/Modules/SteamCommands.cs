@@ -42,28 +42,18 @@ public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
         // Defer the response to avoid the "Thinking..." state
         await DeferAsyncCaller();
 
+        // TODO: Get ResponseObjectName from _steamStoreServices
         // Get the first result only.
         List<SteamApp> steamApps = await _steamStoreServices.GetAppsAsync(appName, 1);
-        if (steamApps.Count == 0)
-        {
-            await FollowupAsyncCaller("No results found.");
-            return;
-        }
-        SteamApp steamApp = steamApps.First();
         
-        // Get the embed.
-        Embed? embed = CreateEmbed(steamApp);
-        if (embed == null)
-        {
-            await FollowupAsyncCaller("No results found.");
-            return;
-        }
+        // TODO: Move to _steamStoreServices? Or wrap _steamStoreServices inside a DiscordService?
+        Embed[]? embed = CreateEmbed(steamApps.FirstOrDefault());
         
-        // Get the component.
+        // TODO: Move to service
         MessageComponent component = GetFollowUnfollowComponent();
         
         // Send the response.
-        await FollowupAsyncCaller("", embeds: new[] { embed }, components: component);
+        await FollowupAsyncCaller("", embeds: embed, components: component);
     }
 
     /// <summary>
@@ -110,15 +100,18 @@ public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
     /// </summary>
     /// <param name="steamApp"></param>
     /// <returns></returns>
-    private static Embed? CreateEmbed(SteamApp steamApp)
+    private static Embed[]? CreateEmbed(SteamApp? steamApp)
     {
+        if (steamApp == null) return null;
+        
         Embed? embed = new EmbedBuilder()
             .WithTitle(steamApp.Name)
             .WithUrl(steamApp.Url)
             .WithDescription(steamApp.ShortDescription)
             .WithImageUrl(steamApp.HeaderImage)
             .Build();
-        return embed;
+        
+        return embed != null ? new[] {embed} : null;
     }
 
 
