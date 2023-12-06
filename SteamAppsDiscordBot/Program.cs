@@ -15,8 +15,9 @@ internal abstract class Program
             .ConfigureServices((_, services) => { services.ComposeApplication(); })
             .Build();
 
-        var discordBot = host.Services.GetRequiredService<DiscordBot>();
+        var discordBot = host.Services.GetRequiredService<IDiscordSocketClientAdapter>();
 
+        discordBot.Initialize();
         await discordBot.RunAsync();
     }
 }

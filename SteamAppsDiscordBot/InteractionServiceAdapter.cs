@@ -25,8 +25,13 @@ public class InteractionServiceAdapter : IInteractionServiceAdapter
         return _interactionService.AddModulesAsync(assembly, serviceProvider);
     }
 
-    public Task ExecuteCommandAsync(IInteractionContext socketInteractionContext, IServiceProvider serviceProvider)
+    public Task<IResult> ExecuteCommandAsync(IInteractionContext socketInteractionContext, IServiceProvider serviceProvider)
     {
         return _interactionService.ExecuteCommandAsync(socketInteractionContext, serviceProvider);
+    }
+    
+    public Task<IReadOnlyCollection<RestGlobalCommand>> RegisterCommandsGloballyAsync(bool deleteMissing = true)
+    {
+        return _interactionService.RegisterCommandsGloballyAsync(deleteMissing);
     }
 }

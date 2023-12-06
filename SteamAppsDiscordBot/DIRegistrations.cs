@@ -1,10 +1,12 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Rest;
+using Discord.WebSocket;
 using DiscordBot.Repositories;
 using DiscordBot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+// ReSharper disable RedundantTypeArgumentsOfMethod
 
 namespace DiscordBot;
 
@@ -17,22 +19,24 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
-        services.AddSingleton<DiscordGuildServices>();
-        services.AddSingleton<DiscordBot>();
+        // When working with events that have Cacheable<IMessage, ulong> parameters,
+        // you must enable the message cache in your config settings if you plan to
+        // use the cached message entity. 
+        var client = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
+        services.AddSingleton<DiscordSocketClient>(client);
+        services.AddSingleton<DiscordRestClient>(client.Rest);
+        services.AddSingleton<IDiscordSocketClientAdapter, DiscordSocketClientAdapter>();
+        services.AddSingleton<IInteractionServiceAdapter, InteractionServiceAdapter>();
         
-        /*//When working with events that have Cacheable<IMessage, ulong> parameters,
-        //you must enable the message cache in your config settings if you plan to use the cached message entity.
-        var discordSocketConfig = new DiscordSocketConfig { MessageCacheSize = 100 };
-        var client = new DiscordSocketClient(discordSocketConfig);*/
-        services.AddSingleton<DiscordSocketClient>();
-        
-        services.AddLogging(x => x.AddConsole());
-
         services.AddOptions<DiscordBotOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {
                 configuration.GetSection(DiscordBotOptions.SECTION_NAME).Bind(options);
             });
+        
+        services.AddSingleton<DiscordGuildServices>();
+        
+        services.AddLogging(x => x.AddConsole());
 
         return services;
     }

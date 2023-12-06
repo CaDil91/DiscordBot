@@ -5,7 +5,6 @@ namespace DiscordBot;
 
 public interface IDiscordSocketClientAdapter
 {
-    DiscordSocketClient DiscordClient { get; }
     DiscordSocketRestClient Rest { get; }
     IEnumerable<SocketGuild?> Guilds { get; }
     ConnectionState ConnectionState { get; }
@@ -15,4 +14,7 @@ public interface IDiscordSocketClientAdapter
     
     public Task LoginAsync(TokenType tokenType, string? token, bool validateToken = true);
     public Task StartAsync();
+
+    public Task RunAsync(int timeout = Timeout.Infinite);
+    public void Initialize();
 }
