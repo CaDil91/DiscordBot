@@ -17,10 +17,10 @@ public class DiscordBot
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<DiscordBot> _logger;
 
-    public DiscordBot(DiscordSocketClient client, InteractionService interactionService, IOptions<DiscordBotOptions> discordOptions, IServiceProvider serviceProvider, ILogger<DiscordBot> logger)
+    public DiscordBot(DiscordSocketClientAdapter client, InteractionServiceAdapter interactionService, IOptions<DiscordBotOptions> discordOptions, IServiceProvider serviceProvider, ILogger<DiscordBot> logger)
     {
-        _client = new DiscordSocketClientAdapter(client);
-        _interactionService = new InteractionServiceAdapter(interactionService);
+        _client = client;
+        _interactionService = interactionService;
         _discordOptions = discordOptions;
         _serviceProvider = serviceProvider;
         _logger = logger;

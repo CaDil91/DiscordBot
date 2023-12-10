@@ -1,5 +1,6 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
+using DiscordBot.Adapters;
 using DiscordBot.Repositories;
 using DiscordBot.Services;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,9 @@ public static class DIRegistrations
         // use the cached message entity. 
         var client = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
         services.AddSingleton<DiscordSocketClient>(client);
-        services.AddSingleton<InteractionService>(new InteractionService(client.Rest));
+        services.AddSingleton<DiscordSocketClientAdapter>(new DiscordSocketClientAdapter(client));
+        var interactionService = new InteractionService(client.Rest);
+        services.AddSingleton<InteractionServiceAdapter>(new InteractionServiceAdapter(interactionService));
         
         services.AddSingleton<DiscordBot>();
         services.AddOptions<DiscordBotOptions>()
