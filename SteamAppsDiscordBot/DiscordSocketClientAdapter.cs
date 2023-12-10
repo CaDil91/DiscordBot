@@ -1,53 +1,51 @@
-﻿using System.Reflection;
-using Discord;
+﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.Options;
 
 namespace DiscordBot;
 
 /// <summary>
 /// Adapter for DiscordNet's Discord.WebSocket.DiscordSocketClient.
 /// </summary>
-public class DiscordSocketClientAdapter : IDiscordSocketClientAdapter
+public class DiscordSocketClientAdapter
 {
     private readonly DiscordSocketClient _clientAdaptee;
-    private readonly IOptions<DiscordBotOptions> _discordOptions;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IInteractionServiceAdapter _interactionService;
-
     public DiscordSocketRestClient Rest => _clientAdaptee.Rest;
     public IEnumerable<SocketGuild?> Guilds => _clientAdaptee.Guilds;
     public ConnectionState ConnectionState => _clientAdaptee.ConnectionState;
     
-    public event Func<SocketSlashCommand, Task>? SlashCommandExecuted
-    {
-        add => _clientAdaptee.SlashCommandExecuted += value;
-        remove => _clientAdaptee.SlashCommandExecuted -= value;
-    }
-    public event Func<SocketMessageComponent, Task>? ButtonExecuted
-    {
-        add => _clientAdaptee.ButtonExecuted += value;
-        remove => _clientAdaptee.ButtonExecuted -= value;
-    }
+    /// <summary>
+    ///     Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands, autocompletes.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is fired when an interaction is created. The event handler must return a
+    ///         <see cref="T:System.Threading.Tasks.Task" /> and accept a <see cref="T:Discord.WebSocket.SocketInteraction" /> as its parameter.
+    ///     </para>
+    ///     <para>
+    ///         The interaction created will be passed into the <see cref="T:Discord.WebSocket.SocketInteraction" /> parameter.
+    ///     </para>
+    /// </remarks>
     public event Func<SocketInteraction, Task>? InteractionCreated
     {
         add => _clientAdaptee.InteractionCreated += value;
         remove => _clientAdaptee.InteractionCreated -= value;
     }
+    
+    /// <summary>Fired when guild data has finished downloading.</summary>
+    /// <remarks>
+    ///     It is possible that some guilds might be unsynced if <see cref="P:Discord.WebSocket.DiscordSocketConfig.MaxWaitBetweenGuildAvailablesBeforeReady" />
+    ///     was not long enough to receive all GUILD_AVAILABLEs before READY.
+    /// </remarks>
     public event Func<Task>? Ready
     {
         add => _clientAdaptee.Ready += value;
         remove => _clientAdaptee.Ready -= value;
     }
-
-    public DiscordSocketClientAdapter(DiscordSocketClient clientAdaptee, IOptions<DiscordBotOptions> discordOptions, 
-        IInteractionServiceAdapter interactionService, IServiceProvider serviceProvider)
+    
+    public DiscordSocketClientAdapter(DiscordSocketClient clientAdaptee)
     {
         _clientAdaptee = clientAdaptee;
-        _discordOptions = discordOptions;
-        _serviceProvider = serviceProvider;
-        _interactionService = interactionService;
     }
 
     /// <summary>
@@ -60,29 +58,6 @@ public class DiscordSocketClientAdapter : IDiscordSocketClientAdapter
     /// </returns>
     public IInteractionContext CreateSocketInteractionContext(SocketInteraction interaction) 
         => new SocketInteractionContext(_clientAdaptee, interaction);
-
-    /// <summary>
-    /// An asynchronous method that allows the bot to run with support for optional program cancellation after a specific timeout.
-    /// It performs several steps including:
-    /// 1. Adding modules from the entry assembly to the interaction service using the provided service provider.
-    /// 2. Logging into the client with the bot token.
-    /// 3. Starting the client.
-    /// 4. Hooking up handlers for slash command and button execution events.
-    /// 5. Blocking the current task until the given timeout or until the program is closed.
-    /// </summary>
-    /// <param name="timeout">Optional timeout for program cancellation, infinite by default.</param>
-    public async Task RunAsync(int timeout = Timeout.Infinite)
-    {
-        //_client.Ready += ReadyAsync;
-        
-        await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly() ?? throw new InvalidOperationException(), _serviceProvider);
-        //_client.InteractionCreated += HandleInteraction;
-        
-        await _clientAdaptee.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken);
-        await _clientAdaptee.StartAsync();
-
-        await Task.Delay(timeout);
-    }
 
     /// <summary>
     /// Adapted class has no documentation.

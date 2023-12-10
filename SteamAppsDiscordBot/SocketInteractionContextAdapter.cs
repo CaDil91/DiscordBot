@@ -8,7 +8,7 @@ namespace DiscordBot;
 /// Adapter for DiscordNet's Discord.Interactions.SocketInteractionContext.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class SocketInteractionContextAdapter : ISocketInteractionContextAdapter
+public class SocketInteractionContextAdapter
 {
     private readonly SocketInteractionContext _context;
 

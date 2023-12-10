@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+﻿using Discord.Interactions;
 using Discord.WebSocket;
 using DiscordBot.Repositories;
 using DiscordBot.Services;
@@ -19,16 +19,16 @@ public static class DIRegistrations
     /// <returns></returns>
     public static IServiceCollection RegisterDiscordBot(this IServiceCollection services)
     {
+        services.AddLogging(x => x.AddConsole());
+        
         // When working with events that have Cacheable<IMessage, ulong> parameters,
         // you must enable the message cache in your config settings if you plan to
         // use the cached message entity. 
         var client = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
         services.AddSingleton<DiscordSocketClient>(client);
-        services.AddSingleton<DiscordRestClient>(client.Rest);
-        services.AddSingleton<DiscordBot>();
-        services.AddSingleton<IDiscordSocketClientAdapter, DiscordSocketClientAdapter>();
-        services.AddSingleton<IInteractionServiceAdapter, InteractionServiceAdapter>();
+        services.AddSingleton<InteractionService>(new InteractionService(client.Rest));
         
+        services.AddSingleton<DiscordBot>();
         services.AddOptions<DiscordBotOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {
@@ -36,8 +36,6 @@ public static class DIRegistrations
             });
         
         services.AddSingleton<DiscordGuildServices>();
-        
-        services.AddLogging(x => x.AddConsole());
 
         return services;
     }

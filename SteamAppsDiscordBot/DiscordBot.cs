@@ -9,16 +9,16 @@ namespace DiscordBot;
 
 public class DiscordBot
 {
-    private readonly IDiscordSocketClientAdapter _client;
-    private readonly IInteractionServiceAdapter _interactionService;
+    private readonly DiscordSocketClientAdapter _client;
+    private readonly InteractionServiceAdapter _interactionService;
     private readonly IOptions<DiscordBotOptions> _discordOptions;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<DiscordBot> _logger;
 
-    public DiscordBot(IDiscordSocketClientAdapter client, IInteractionServiceAdapter interactionService, IOptions<DiscordBotOptions> discordOptions, IServiceProvider serviceProvider, ILogger<DiscordBot> logger)
+    public DiscordBot(DiscordSocketClient client, InteractionService interactionService, IOptions<DiscordBotOptions> discordOptions, IServiceProvider serviceProvider, ILogger<DiscordBot> logger)
     {
-        _client = client;
-        _interactionService = interactionService;
+        _client = new DiscordSocketClientAdapter(client);
+        _interactionService = new InteractionServiceAdapter(interactionService);
         _discordOptions = discordOptions;
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -38,7 +38,7 @@ public class DiscordBot
             _serviceProvider);
 
         // Process the InteractionCreated payloads to execute Interactions commands
-        _client.InteractionCreated += HandleInteraction;
+        _client.InteractionCreated += HandleInteractionAsync;
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public class DiscordBot
         await Task.Delay(timeout);
     }
 
-    private async Task HandleInteraction(SocketInteraction interaction)
+    private async Task HandleInteractionAsync(SocketInteraction interaction)
     {
         try
         {
