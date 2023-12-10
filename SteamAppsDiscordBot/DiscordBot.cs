@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -58,6 +59,13 @@ public class DiscordBot
         await Task.Delay(timeout);
     }
 
+    /// <summary>
+    /// Handles the interaction coming from a socket asynchronously.
+    /// </summary>
+    /// <param name="interaction">The interaction coming from the Socket to be handled.</param>
+    /// <remarks> Excluding from code coverage due to testability with SocketInteraction param. Is hooked
+    /// to event and I'm not looking for a work around atm. Extra logging instead. </remarks>
+    [ExcludeFromCodeCoverage]
     private async Task HandleInteractionAsync(SocketInteraction interaction)
     {
         try
@@ -85,15 +93,24 @@ public class DiscordBot
                         throw new ArgumentOutOfRangeException(result.Error.ToString());
                 }
         }
-        catch
+        catch (Exception e)
         {
             // If Slash Command execution fails it is most likely that the original interaction acknowledgement will persist.
             // It is a good idea to delete the original
             // response, or at least let the user know that something went wrong during the command execution.
             if (interaction.Type is InteractionType.ApplicationCommand)
                 await interaction.GetOriginalResponseAsync().ContinueWith(async (msg) => await msg.Result.DeleteAsync());
+            
+            _logger.LogError("Error executing command: {Error}", e);
         }
     }
     
-    private async Task ReadyAsync() => await _interactionService.RegisterCommandsGloballyAsync();
+    /// <summary>
+    /// Forwards the call to InteractionService's RegisterCommandsGloballyAsync method.
+    /// </summary>
+    /// <remarks>
+    /// This method eventually calls a EnsureClientReady(); method, helping us to ensure that the client is ready
+    /// once we return from this method.
+    /// </remarks>
+    public async Task ReadyAsync() => await _interactionService.RegisterCommandsGloballyAsync();
 }

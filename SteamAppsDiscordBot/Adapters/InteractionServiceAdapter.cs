@@ -30,6 +30,13 @@ public class InteractionServiceAdapter : IInteractionServiceAdapter
         return _interactionService.ExecuteCommandAsync(socketInteractionContext, serviceProvider);
     }
     
+    /// <summary>
+    ///     Register Application Commands from <see cref="P:Discord.Interactions.InteractionService.ContextCommands" /> and <see cref="P:Discord.Interactions.InteractionService.SlashCommands" /> to Discord on in global scope.
+    /// </summary>
+    /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="T:Discord.Interactions.InteractionService" />.</param>
+    /// <returns>
+    ///    A task representing the command registration process. The task result contains the active global application commands of bot.
+    /// </returns>
     public Task<IReadOnlyCollection<RestGlobalCommand>> RegisterCommandsGloballyAsync(bool deleteMissing = true)
     {
         return _interactionService.RegisterCommandsGloballyAsync(deleteMissing);
