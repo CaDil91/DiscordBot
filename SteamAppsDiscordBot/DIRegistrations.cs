@@ -25,6 +25,7 @@ public static class DIRegistrations
         var client = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
         services.AddSingleton<DiscordSocketClient>(client);
         services.AddSingleton<DiscordRestClient>(client.Rest);
+        services.AddSingleton<DiscordBot>();
         services.AddSingleton<IDiscordSocketClientAdapter, DiscordSocketClientAdapter>();
         services.AddSingleton<IInteractionServiceAdapter, InteractionServiceAdapter>();
         
