@@ -3,7 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.Rest;
 
-namespace DiscordBot;
+namespace DiscordBot.Adapters;
 
 /// <summary>
 /// InteractionServiceAdapter is a class that acts as an adapter (wrapper) for the InteractionService class.

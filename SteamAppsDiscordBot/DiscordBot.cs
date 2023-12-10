@@ -2,6 +2,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using DiscordBot.Adapters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -11,6 +12,7 @@ public class DiscordBot
 {
     private readonly DiscordSocketClientAdapter _client;
     private readonly InteractionServiceAdapter _interactionService;
+    
     private readonly IOptions<DiscordBotOptions> _discordOptions;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<DiscordBot> _logger;

@@ -2,7 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 
-namespace DiscordBot;
+namespace DiscordBot.Adapters;
 
 /// <summary>
 /// Adapter for DiscordNet's Discord.WebSocket.DiscordSocketClient.
