@@ -28,9 +28,11 @@ public static class DIRegistrations
         // use the cached message entity. 
         var client = new DiscordSocketClient(new DiscordSocketConfig { MessageCacheSize = 100 });
         services.AddSingleton<DiscordSocketClient>(client);
-        services.AddSingleton<DiscordSocketClientAdapter>(new DiscordSocketClientAdapter(client));
+        services.AddSingleton<IDiscordSocketClientAdapter, DiscordSocketClientAdapter>();
+        
         var interactionService = new InteractionService(client.Rest);
-        services.AddSingleton<InteractionServiceAdapter>(new InteractionServiceAdapter(interactionService));
+        services.AddSingleton<InteractionService>(interactionService);
+        services.AddSingleton<IInteractionServiceAdapter, InteractionServiceAdapter>();
         
         services.AddSingleton<DiscordBot>();
         services.AddOptions<DiscordBotOptions>()

@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using SteamAppsDiscordBot;
 using SteamAppsDiscordBot.Services;
 
-namespace SteamAppsDiscordBot.GoogleService;
+namespace SteamAppsDiscordBotTests.GoogleService;
 
 public class GoogleCustomSearchServiceTests
 {

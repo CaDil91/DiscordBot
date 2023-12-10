@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using SteamAppsDiscordBot;
 using SteamAppsDiscordBot.Services;
 
-namespace SteamAppsDiscordBot.SteamServices;
+namespace SteamAppsDiscordBotTests.SteamServices;
 
 public class DIRegistrationTests
 {

@@ -10,14 +10,14 @@ namespace SteamAppsDiscordBot;
 
 public class DiscordBot
 {
-    private readonly DiscordSocketClientAdapter _client;
-    private readonly InteractionServiceAdapter _interactionService;
+    private readonly IDiscordSocketClientAdapter _client;
+    private readonly IInteractionServiceAdapter _interactionService;
     
     private readonly IOptions<DiscordBotOptions> _discordOptions;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<DiscordBot> _logger;
 
-    public DiscordBot(DiscordSocketClientAdapter client, InteractionServiceAdapter interactionService, IOptions<DiscordBotOptions> discordOptions, IServiceProvider serviceProvider, ILogger<DiscordBot> logger)
+    public DiscordBot(IDiscordSocketClientAdapter client, IInteractionServiceAdapter interactionService, IOptions<DiscordBotOptions> discordOptions, IServiceProvider serviceProvider, ILogger<DiscordBot> logger)
     {
         _client = client;
         _interactionService = interactionService;
@@ -29,14 +29,15 @@ public class DiscordBot
     /// <summary>
     /// Asynchronously initializes our Command handling using Discord.Net's InteractionService implementation.
     /// </summary>
+    /// <param name="assembly">The assembly to search for InteractionModuleBase<T> modules</param>
     /// <exception cref="InvalidOperationException">Thrown when the operated assembly cannot be retrieved.</exception>
-    public async Task InitializeInteractionServicesAsync()
+    public async Task InitializeInteractionServicesAsync(Assembly? assembly)
     {
         // Process when the client is ready, so we can register our commands.
         _client.Ready += ReadyAsync;
 
         // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
-        await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly() ?? throw new InvalidOperationException(),
+        await _interactionService.AddModulesAsync(assembly ?? throw new InvalidOperationException(),
             _serviceProvider);
 
         // Process the InteractionCreated payloads to execute Interactions commands
@@ -49,7 +50,7 @@ public class DiscordBot
     /// <param name="timeout">Delay before the method completes, default is infinite.</param>
     public async Task RunAsync(int timeout = Timeout.Infinite)
     {
-        await InitializeInteractionServicesAsync().ConfigureAwait(false);
+        await InitializeInteractionServicesAsync(Assembly.GetEntryAssembly()).ConfigureAwait(false);
         
         await _client.LoginAsync(TokenType.Bot, _discordOptions.Value.DiscordToken).ConfigureAwait(false);
         await _client.StartAsync().ConfigureAwait(false);

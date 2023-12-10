@@ -11,7 +11,7 @@ namespace SteamAppsDiscordBot.Adapters;
 /// Each method in this class corresponds directly to a method in InteractionService, and just forwards the call.
 /// The purpose of this class is to allow InteractionService, which doesn't have a parameterless constructor, to be used indirectly through an interface, which can be mocked during testing.
 /// </summary>
-public class InteractionServiceAdapter
+public class InteractionServiceAdapter : IInteractionServiceAdapter
 {
     private readonly InteractionService _interactionService;
 

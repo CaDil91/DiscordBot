@@ -1,4 +1,4 @@
-﻿namespace SteamAppsDiscordBot;
+﻿namespace SteamAppsDiscordBotTests;
 
 public class CompositionRootTests
 {

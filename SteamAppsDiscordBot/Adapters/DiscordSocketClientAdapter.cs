@@ -7,7 +7,7 @@ namespace SteamAppsDiscordBot.Adapters;
 /// <summary>
 /// Adapter for DiscordNet's Discord.WebSocket.DiscordSocketClient.
 /// </summary>
-public class DiscordSocketClientAdapter
+public class DiscordSocketClientAdapter : IDiscordSocketClientAdapter
 {
     private readonly DiscordSocketClient _clientAdaptee;
     public DiscordSocketRestClient Rest => _clientAdaptee.Rest;
@@ -46,6 +46,11 @@ public class DiscordSocketClientAdapter
     public DiscordSocketClientAdapter(DiscordSocketClient clientAdaptee)
     {
         _clientAdaptee = clientAdaptee;
+    }
+
+    // For testing purposes only.
+    public DiscordSocketClientAdapter()
+    {
     }
 
     /// <summary>

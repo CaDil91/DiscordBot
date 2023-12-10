@@ -6,10 +6,6 @@
         <Nullable>enable</Nullable>
 
         <IsPackable>false</IsPackable>
-
-        <RootNamespace>SteamAppsDiscordBot</RootNamespace>
-
-        <AssemblyName>SteamAppsDiscordBot</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

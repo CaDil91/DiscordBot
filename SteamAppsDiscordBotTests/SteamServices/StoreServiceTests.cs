@@ -5,7 +5,7 @@ using Moq.Protected;
 using SteamAppsDiscordBot.Services;
 using SteamAppsDiscordBot.Services.DTO;
 
-namespace SteamAppsDiscordBot.SteamServices;
+namespace SteamAppsDiscordBotTests.SteamServices;
 
 public class SteamServicesStoreServiceTests
 {
