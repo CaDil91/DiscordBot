@@ -79,7 +79,7 @@ public class DiscordBot
                     case InteractionCommandError.Unsuccessful:
                     case InteractionCommandError.ParseFailed:
                     case null:
-                        _logger.LogError(result.ErrorReason);
+                        _logger.LogError("Error executing command: {Error}", result.Error);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(result.Error.ToString());
