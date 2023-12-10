@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace DiscordBot.Services.DTO;
+namespace SteamAppsDiscordBot.Services.DTO;
 
 public class AppNews
 {

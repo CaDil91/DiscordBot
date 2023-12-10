@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace DiscordBot.Services.DTO;
+namespace SteamAppsDiscordBot.Services.DTO;
 
 public class SteamApp
 {

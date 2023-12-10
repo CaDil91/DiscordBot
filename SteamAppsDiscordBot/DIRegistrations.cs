@@ -1,15 +1,16 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
-using DiscordBot.Adapters;
-using DiscordBot.Repositories;
-using DiscordBot.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SteamAppsDiscordBot.Adapters;
+using SteamAppsDiscordBot.Repositories;
+using SteamAppsDiscordBot.Services;
+
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
-namespace DiscordBot;
+namespace SteamAppsDiscordBot;
 
 public static class DIRegistrations
 {

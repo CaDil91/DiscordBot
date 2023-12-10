@@ -1,10 +1,10 @@
 ﻿using Discord;
-using DiscordBot.Services;
-using DiscordBot.Services.DTO;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SteamAppsDiscordBot.Services;
+using SteamAppsDiscordBot.Services.DTO;
 
-namespace DiscordBot.Modules;
+namespace SteamAppsDiscordBot.Modules;
 
 public class SteamCommandsTests
 {

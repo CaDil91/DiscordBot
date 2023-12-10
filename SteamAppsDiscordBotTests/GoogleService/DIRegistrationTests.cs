@@ -1,10 +1,10 @@
-﻿using DiscordBot.Services;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using SteamAppsDiscordBot.Services;
 
-namespace DiscordBot.GoogleService;
+namespace SteamAppsDiscordBot.GoogleService;
 
 public class DIRegistrationTests
 {

@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.Interactions;
-using DiscordBot.Services;
-using DiscordBot.Services.DTO;
 using Microsoft.Extensions.Logging;
+using SteamAppsDiscordBot.Services;
+using SteamAppsDiscordBot.Services.DTO;
 
-namespace DiscordBot.Modules;
+namespace SteamAppsDiscordBot.Modules;
 
 /// <summary>
 /// Command modules are transient objects.

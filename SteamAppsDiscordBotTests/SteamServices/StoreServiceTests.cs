@@ -1,11 +1,11 @@
 ﻿using System.Net;
-using DiscordBot.Services;
-using DiscordBot.Services.DTO;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
+using SteamAppsDiscordBot.Services;
+using SteamAppsDiscordBot.Services.DTO;
 
-namespace DiscordBot.SteamServices;
+namespace SteamAppsDiscordBot.SteamServices;
 
 public class SteamServicesStoreServiceTests
 {

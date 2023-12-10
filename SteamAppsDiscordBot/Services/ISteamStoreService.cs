@@ -1,6 +1,6 @@
-﻿using DiscordBot.Services.DTO;
+﻿using SteamAppsDiscordBot.Services.DTO;
 
-namespace DiscordBot.Services;
+namespace SteamAppsDiscordBot.Services;
 
 public interface ISteamStoreService //Should rethink how I want to organize these services. This suggests I'd want  ISteamService, but is it going to be too generic?
 {

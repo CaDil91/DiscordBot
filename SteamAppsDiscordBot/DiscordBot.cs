@@ -2,11 +2,11 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using DiscordBot.Adapters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SteamAppsDiscordBot.Adapters;
 
-namespace DiscordBot;
+namespace SteamAppsDiscordBot;
 
 public class DiscordBot
 {
@@ -30,7 +30,7 @@ public class DiscordBot
     /// Asynchronously initializes our Command handling using Discord.Net's InteractionService implementation.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the operated assembly cannot be retrieved.</exception>
-    private async Task InitializeInteractionServicesAsync()
+    public async Task InitializeInteractionServicesAsync()
     {
         // Process when the client is ready, so we can register our commands.
         _client.Ready += ReadyAsync;

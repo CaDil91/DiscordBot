@@ -1,8 +1,8 @@
-﻿using DiscordBot.Services.DTO;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SteamAppsDiscordBot.Services.DTO;
 
-namespace DiscordBot.Services;
+namespace SteamAppsDiscordBot.Services;
 
 public class SteamStoreServices : ISteamStoreService
 {

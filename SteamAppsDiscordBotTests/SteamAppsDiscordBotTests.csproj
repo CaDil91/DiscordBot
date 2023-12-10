@@ -7,7 +7,9 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>DiscordBot</RootNamespace>
+        <RootNamespace>SteamAppsDiscordBot</RootNamespace>
+
+        <AssemblyName>SteamAppsDiscordBot</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

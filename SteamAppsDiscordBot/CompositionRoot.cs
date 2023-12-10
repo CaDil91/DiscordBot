@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscordBot;
+namespace SteamAppsDiscordBot;
 
 public static class CompositionRoot
 {

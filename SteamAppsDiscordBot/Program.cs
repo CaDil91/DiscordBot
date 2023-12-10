@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace DiscordBot;
+namespace SteamAppsDiscordBot;
 
 [ExcludeFromCodeCoverage]
 internal abstract class Program

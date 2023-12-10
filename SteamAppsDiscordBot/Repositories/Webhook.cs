@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DiscordBot.Repositories;
+namespace SteamAppsDiscordBot.Repositories;
 
 public class Webhook
 {

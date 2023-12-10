@@ -1,9 +1,9 @@
-﻿using DiscordBot.Services;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using SteamAppsDiscordBot.Services;
 
-namespace DiscordBot.SteamServices;
+namespace SteamAppsDiscordBot.SteamServices;
 
 public class DIRegistrationTests
 {

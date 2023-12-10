@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Repositories;
+namespace SteamAppsDiscordBot.Repositories;
 public sealed class SteamNewsDatabaseContext : DbContext
 {
     private readonly ILogger<SteamNewsDatabaseContext> _logger;

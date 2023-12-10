@@ -1,11 +1,11 @@
 ﻿using System.Net;
-using DiscordBot.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using SteamAppsDiscordBot.Services;
 
-namespace DiscordBot.GoogleService;
+namespace SteamAppsDiscordBot.GoogleService;
 
 public class GoogleCustomSearchServiceTests
 {
