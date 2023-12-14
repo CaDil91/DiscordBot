@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Diagnostics.CodeAnalysis;
+using Discord;
 using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 using SteamAppsDiscordBot.Services;
@@ -19,14 +20,14 @@ namespace SteamAppsDiscordBot.Modules;
 /// 
 /// - More info: https://discordnet.dev/guides/int_framework/intro.html
 /// </summary>
-public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
+public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly ILogger<SteamCommands> _logger;
+    private readonly ILogger<SteamAppCommands> _logger;
     private readonly ISteamStoreService _steamStoreServices;
     private const string STEAM_FOLLOW_CUSTOM_ID = "Steam_Follow";
     private const string STEAM_UNFOLLOW_CUSTOM_ID = "Steam_Unfollow";
 
-    public SteamCommands(ILogger<SteamCommands> logger, ISteamStoreService steamStoreServices)
+    public SteamAppCommands(ILogger<SteamAppCommands> logger, ISteamStoreService steamStoreServices)
     {
         _logger = logger;
         _steamStoreServices = steamStoreServices;
@@ -40,42 +41,50 @@ public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
     public async Task GetSteamAppAsync(string appName)
     {
         // Defer the response to avoid the "Thinking..." state
-        await DeferAsyncCaller();
-
-        // TODO: Get ResponseObjectName from _steamStoreServices
+        await DeferWrapperAsync();
+        
         // Get the first result only.
-        List<SteamApp> steamApps = await _steamStoreServices.GetAppsAsync(appName, 1);
-        
-        // TODO: Move to _steamStoreServices? Or wrap _steamStoreServices inside a DiscordService?
-        Embed[]? embed = CreateEmbed(steamApps.FirstOrDefault());
-        
-        // TODO: Move to service
-        MessageComponent component = GetFollowUnfollowComponent();
+        List<SteamApp> steamApps = await _steamStoreServices.GetAppsAsync(appName, 1).ConfigureAwait(false);
+        SteamApp? steamApp = steamApps.FirstOrDefault();
+        if (steamApp?.Name == null)
+        {
+            await FollowupWrapperAsync("No results found.").ConfigureAwait(false);
+            return;
+        }
         
         // Send the response.
-        await FollowupAsyncCaller("", embeds: embed, components: component);
+        await FollowupWrapperAsync(steamApp).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Wrapper for DeferAsync().
-    /// Created for mocking in unit tests.
+    /// Wraps the FollowupAsync method with additional parameters for a given SteamApp and sends a follow-up message.
     /// </summary>
-    private async Task DeferAsyncCaller()
+    /// <param name="steamApp">The SteamApp object representing the app for which the follow-up message is being sent.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task FollowupWrapperAsync(SteamApp steamApp)
     {
-        try
+        if (steamApp.SteamAppid == 0)
         {
-            await DeferAsync();
+            await FollowupWrapperAsync("Unable to collect app details.").ConfigureAwait(false);
+            return;
         }
-        catch (Exception e)
-        {
-            _logger.LogWarning(e, "Unable to defer response");
-        }
+        Embed embed = new EmbedBuilder()
+            .WithTitle(steamApp.Name)
+            .WithUrl(steamApp.Url)
+            .WithDescription(steamApp.ShortDescription)
+            .WithImageUrl(steamApp.HeaderImage)
+            .Build();
+        
+        MessageComponent component = GetFollowUnfollowComponent();
+        
+        await FollowupWrapperAsync("", embeds: new []{ embed }, components: component).ConfigureAwait(false);
     }
 
     /// <summary>
     /// TODO: Comment
     /// </summary>
     /// <returns></returns>
+    [ExcludeFromCodeCoverage]
     private static MessageComponent GetFollowUnfollowComponent()
     {
         ButtonBuilder followButton = new()
@@ -96,26 +105,6 @@ public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
     }
 
     /// <summary>
-    /// TODO: Comment
-    /// </summary>
-    /// <param name="steamApp"></param>
-    /// <returns></returns>
-    private static Embed[]? CreateEmbed(SteamApp? steamApp)
-    {
-        if (steamApp == null) return null;
-        
-        Embed? embed = new EmbedBuilder()
-            .WithTitle(steamApp.Name)
-            .WithUrl(steamApp.Url)
-            .WithDescription(steamApp.ShortDescription)
-            .WithImageUrl(steamApp.HeaderImage)
-            .Build();
-        
-        return embed != null ? new[] {embed} : null;
-    }
-
-
-    /// <summary>
     /// Wrapper for FollowupAsync().
     /// Created for mocking in unit tests.
     /// </summary>
@@ -127,7 +116,8 @@ public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
     /// <param name="options"></param>
     /// <param name="components"></param>
     /// <returns></returns>
-    public async Task FollowupAsyncCaller(string message, Embed[]? embeds = null, bool isTTS = false, 
+    [ExcludeFromCodeCoverage]
+    private async Task FollowupWrapperAsync(string message, Embed[]? embeds = null, bool isTTS = false, 
         bool ephemeral = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null, 
         MessageComponent? components = null)
     {
@@ -137,7 +127,25 @@ public class SteamCommands : InteractionModuleBase<SocketInteractionContext>
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, "Unable to send followup message");
+            _logger.LogError(e, "Unable to send followup message {message}", message);
+            if (embeds != null) _logger.LogError(e, "Embed: {embedTitle}", embeds.First());
+        }
+    }
+
+    /// <summary>
+    /// Wrapper for DeferAsync().
+    /// Created for mocking in unit tests.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    private async Task DeferWrapperAsync()
+    {
+        try
+        {
+            await DeferAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unable to defer response");
         }
     }
 }

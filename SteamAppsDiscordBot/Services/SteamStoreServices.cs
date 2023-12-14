@@ -49,7 +49,12 @@ public class SteamStoreServices : ISteamStoreService
         
         return steamApps;
     }
-    
+
+    public Task<List<SteamApp>> GetAppAsync(string searchTerm)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Get a SteamApp from Steam's store.steampowered.com/api.
     /// </summary>
