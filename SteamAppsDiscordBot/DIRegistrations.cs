@@ -1,4 +1,5 @@
-﻿using Discord.Interactions;
+﻿using System.Diagnostics.CodeAnalysis;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -7,11 +8,11 @@ using Microsoft.Extensions.Logging;
 using SteamAppsDiscordBot.Adapters;
 using SteamAppsDiscordBot.Repositories;
 using SteamAppsDiscordBot.Services;
-
 // ReSharper disable RedundantTypeArgumentsOfMethod
 
 namespace SteamAppsDiscordBot;
 
+[ExcludeFromCodeCoverage]
 public static class DIRegistrations
 {
     /// <summary>
