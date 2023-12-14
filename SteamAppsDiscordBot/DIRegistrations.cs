@@ -16,7 +16,7 @@ namespace SteamAppsDiscordBot;
 public static class DIRegistrations
 {
     /// <summary>
-    ///     DI container IServiceCollection extension method to register DiscordBot dependencies and settings.
+    /// DI container IServiceCollection extension method to register DiscordBot dependencies and settings.
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
@@ -48,7 +48,7 @@ public static class DIRegistrations
     }
     
     /// <summary>
-    ///     DI container IServiceCollection extension method to register SteamServices dependencies and settings.
+    /// DI container IServiceCollection extension method to register SteamServices dependencies and settings.
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
@@ -68,6 +68,11 @@ public static class DIRegistrations
         return services;
     }
     
+    /// <summary>
+    /// DI container IServiceCollection extension method to register GoogleServices dependencies and settings.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection RegisterGoogleServices(this IServiceCollection services)
     {
         //change
