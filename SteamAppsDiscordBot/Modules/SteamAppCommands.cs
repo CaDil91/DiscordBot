@@ -27,6 +27,11 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     private const string STEAM_FOLLOW_CUSTOM_ID = "Steam_Follow";
     private const string STEAM_UNFOLLOW_CUSTOM_ID = "Steam_Unfollow";
 
+    /// <summary>
+    /// Constructor for the SteamAppCommands class.
+    /// </summary>
+    /// <param name="logger">An instance of the ILogger interface used for logging.</param>
+    /// <param name="steamStoreServices">An instance of the ISteamStoreService interface used for accessing the Steam Store services.</param>
     public SteamAppCommands(ILogger<SteamAppCommands> logger, ISteamStoreService steamStoreServices)
     {
         _logger = logger;
@@ -81,9 +86,9 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     }
 
     /// <summary>
-    /// TODO: Comment
+    /// Gets the follow/unfollow component with attached buttons.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The follow/unfollow component.</returns>
     [ExcludeFromCodeCoverage]
     private static MessageComponent GetFollowUnfollowComponent()
     {
@@ -105,20 +110,17 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     }
 
     /// <summary>
-    /// Wrapper for FollowupAsync().
-    /// Created for mocking in unit tests.
+    /// Wraps the FollowupAsync method to handle exceptions and log errors.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="embeds"></param>
-    /// <param name="isTTS"></param>
-    /// <param name="ephemeral"></param>
-    /// <param name="allowedMentions"></param>
-    /// <param name="options"></param>
-    /// <param name="components"></param>
-    /// <returns></returns>
-    [ExcludeFromCodeCoverage]
-    private async Task FollowupWrapperAsync(string message, Embed[]? embeds = null, bool isTTS = false, 
-        bool ephemeral = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null, 
+    /// <param name="message">The content of the follow-up message.</param>
+    /// <param name="embeds">An array of embeds to include in the message. Optional.</param>
+    /// <param name="isTTS">Indicates if the message should be sent with text-to-speech. Default is false.</param>
+    /// <param name="ephemeral">Indicates if the message should be ephemeral. Default is false.</param>
+    /// <param name="allowedMentions">Allowed mention types for the message. Optional.</param>
+    /// <param name="options">Options for sending the message. Optional.</param>
+    /// <param name="components">Message components to include in the message. Optional.</param>
+    private async Task FollowupWrapperAsync(string message, Embed[]? embeds = null, bool isTTS = false,
+        bool ephemeral = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null,
         MessageComponent? components = null)
     {
         try
@@ -133,9 +135,9 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     }
 
     /// <summary>
-    /// Wrapper for DeferAsync().
-    /// Created for mocking in unit tests.
+    /// Wraps the DeferAsync method to handle exceptions and log errors.
     /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [ExcludeFromCodeCoverage]
     private async Task DeferWrapperAsync()
     {
