@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace SteamAppsDiscordBot.Services;
 
+/// <summary>
+/// Represents a Google Custom Search service that implements the IGoogleSearchRepository interface.
+/// </summary>
 public class GoogleCustomSearchService : IGoogleSearchRepository
 {
     private readonly ILogger<GoogleCustomSearchService> _logger;
@@ -26,8 +29,8 @@ public class GoogleCustomSearchService : IGoogleSearchRepository
         _googleApiKey = googleOptions.Value.Key;
     }
 
-    /// <inheritdoc/>
-    public async Task<List<Uri>> GetCustomSearchResultsAsync(string sQuery, int iCount = 10)
+    
+    public async Task<List<Uri>> SearchAsync(string sQuery, int iCount = 10)
     {
         HttpResponseMessage response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
         if (!response.IsSuccessStatusCode)

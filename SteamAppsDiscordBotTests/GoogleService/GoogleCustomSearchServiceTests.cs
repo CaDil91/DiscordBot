@@ -84,7 +84,7 @@ public class GoogleCustomSearchServiceTests
         // Act.
         // Assert.
         await Assert.ThrowsAsync<HttpRequestException>(() =>
-            steamStoreRepository.GetCustomSearchResultsAsync("Any query."));
+            steamStoreRepository.SearchAsync("Any query."));
         _loggerMock.Verify(
             x => x.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
@@ -117,7 +117,7 @@ public class GoogleCustomSearchServiceTests
 
         // Act.
         // Assert.
-        await Assert.ThrowsAsync<Exception>(() => steamStoreRepository.GetCustomSearchResultsAsync("Any query."));
+        await Assert.ThrowsAsync<Exception>(() => steamStoreRepository.SearchAsync("Any query."));
         _loggerMock.Verify(
             x => x.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Critical),
@@ -134,7 +134,7 @@ public class GoogleCustomSearchServiceTests
         _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.BadRequest;
 
         // Act.
-        await _subjectUnderTest?.GetCustomSearchResultsAsync("Any query.")!;
+        await _subjectUnderTest?.SearchAsync("Any query.")!;
 
         // Assert.
         _loggerMock.Verify(
@@ -155,7 +155,7 @@ public class GoogleCustomSearchServiceTests
         _mockedHttpClientsResponseMessage.StatusCode = HttpStatusCode.BadRequest;
 
         // Act.
-        List<Uri> result = await _subjectUnderTest!.GetCustomSearchResultsAsync("Any query.").ConfigureAwait(false);
+        List<Uri> result = await _subjectUnderTest!.SearchAsync("Any query.").ConfigureAwait(false);
 
         // Assert.
         Assert.Empty(result);
@@ -171,7 +171,7 @@ public class GoogleCustomSearchServiceTests
 
         // Act.
         await Assert.ThrowsAsync<Newtonsoft.Json.JsonReaderException>(() =>
-            _subjectUnderTest!.GetCustomSearchResultsAsync("Any query."));
+            _subjectUnderTest!.SearchAsync("Any query."));
 
         _loggerMock.Verify(
             x => x.Log(
@@ -193,7 +193,7 @@ public class GoogleCustomSearchServiceTests
         _mockedHttpClientsResponseMessage.Content = new StringContent(sContent);
 
         // Act.
-        await Assert.ThrowsAsync<ArgumentException>(() => _subjectUnderTest!.GetCustomSearchResultsAsync(sQuery));
+        await Assert.ThrowsAsync<ArgumentException>(() => _subjectUnderTest!.SearchAsync(sQuery));
         _loggerMock.Verify(
             x => x.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
@@ -212,7 +212,7 @@ public class GoogleCustomSearchServiceTests
         _mockedHttpClientsResponseMessage.Content = new StringContent(@"{ ""items"": [] }");
 
         // Act
-        List<Uri> result = await _subjectUnderTest!.GetCustomSearchResultsAsync("Any query.").ConfigureAwait(false);
+        List<Uri> result = await _subjectUnderTest!.SearchAsync("Any query.").ConfigureAwait(false);
 
         // Assert
         Assert.Empty(result);
@@ -227,7 +227,7 @@ public class GoogleCustomSearchServiceTests
             new StringContent(@"{ ""items"": [ { ""link"": ""Invalid uri"" } ] }");
 
         // Act
-        List<Uri> result = await _subjectUnderTest!.GetCustomSearchResultsAsync("Any query.").ConfigureAwait(false);
+        List<Uri> result = await _subjectUnderTest!.SearchAsync("Any query.").ConfigureAwait(false);
 
         // Assert
         Assert.Empty(result);
@@ -253,7 +253,7 @@ public class GoogleCustomSearchServiceTests
             ] }");
 
         // Act
-        List<Uri> result = await _subjectUnderTest!.GetCustomSearchResultsAsync("Any query.", 5).ConfigureAwait(false);
+        List<Uri> result = await _subjectUnderTest!.SearchAsync("Any query.", 5).ConfigureAwait(false);
 
         // Assert
         Assert.Equal(5, result.Count);
@@ -273,7 +273,7 @@ public class GoogleCustomSearchServiceTests
 
 
         // Act.
-        List<Uri> result = await _subjectUnderTest!.GetCustomSearchResultsAsync("Any query.", 5).ConfigureAwait(false);
+        List<Uri> result = await _subjectUnderTest!.SearchAsync("Any query.", 5).ConfigureAwait(false);
 
         // Assert.
         Assert.Equal(3, result.Count);

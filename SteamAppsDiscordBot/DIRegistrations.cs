@@ -12,6 +12,9 @@ using SteamAppsDiscordBot.Services;
 
 namespace SteamAppsDiscordBot;
 
+/// <summary>
+/// DI container IServiceCollection extension method to register DiscordBot dependencies and settings.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public static class DIRegistrations
 {

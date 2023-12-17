@@ -32,7 +32,7 @@ public class SteamStoreServices : ISteamStoreService
     public async Task<List<SteamApp>> GetAppsAsync(string searchTerm = "", int iAppReturnCountMax = 3)
     {
         // Get top results from custom google search api.
-        List<Uri> searchResults = await _steamStoreRepository.GetCustomSearchResultsAsync(searchTerm, iAppReturnCountMax);
+        List<Uri> searchResults = await _steamStoreRepository.SearchAsync(searchTerm, iAppReturnCountMax);
         if (searchResults.Count == 0) return new List<SteamApp>();
         
         // Get the app id's from the search results.

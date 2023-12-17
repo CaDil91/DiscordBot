@@ -2,6 +2,9 @@
 
 namespace SteamAppsDiscordBot.Services;
 
+/// <summary>
+/// Represents an interface for retrieving search results from Google asynchronously.
+/// </summary>
 public interface IGoogleSearchRepository
 {
     /// <summary>
@@ -14,5 +17,5 @@ public interface IGoogleSearchRepository
     /// <exception cref="JsonException"></exception>
     /// <exception cref="NullReferenceException"></exception>
     /// <returns>Can return empty results</returns>
-    public Task<List<Uri>> GetCustomSearchResultsAsync(string sQuery, int iCount = 10);
+    public Task<List<Uri>> SearchAsync(string sQuery, int iCount = 10);
 }

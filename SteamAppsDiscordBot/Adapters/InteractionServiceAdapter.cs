@@ -15,28 +15,29 @@ public class InteractionServiceAdapter : IInteractionServiceAdapter
 {
     private readonly InteractionService _interactionService;
 
+    /// <summary>
+    /// InteractionServiceAdapter class is responsible for adapting <see cref="InteractionService"/>.
+    /// </summary>
+    /// <param name="interactionService">The InteractionService object to be adapted.</param>
     public InteractionServiceAdapter(InteractionService interactionService)
     {
         _interactionService = interactionService;
     }
 
+    /// <inheritdoc />
     public Task AddModulesAsync(Assembly assembly, IServiceProvider serviceProvider)
     {
         return _interactionService.AddModulesAsync(assembly, serviceProvider);
     }
 
+    /// <inheritdoc />
     public Task<IResult> ExecuteCommandAsync(IInteractionContext socketInteractionContext, IServiceProvider serviceProvider)
     {
         return _interactionService.ExecuteCommandAsync(socketInteractionContext, serviceProvider);
     }
-    
-    /// <summary>
-    ///     Register Application Commands from <see cref="P:Discord.Interactions.InteractionService.ContextCommands" /> and <see cref="P:Discord.Interactions.InteractionService.SlashCommands" /> to Discord on in global scope.
-    /// </summary>
-    /// <param name="deleteMissing">If <see langword="false" />, this operation will not delete the commands that are missing from <see cref="T:Discord.Interactions.InteractionService" />.</param>
-    /// <returns>
-    ///    A task representing the command registration process. The task result contains the active global application commands of bot.
-    /// </returns>
+
+
+    /// <inheritdoc />
     public Task<IReadOnlyCollection<RestGlobalCommand>> RegisterCommandsGloballyAsync(bool deleteMissing = true)
     {
         return _interactionService.RegisterCommandsGloballyAsync(deleteMissing);
