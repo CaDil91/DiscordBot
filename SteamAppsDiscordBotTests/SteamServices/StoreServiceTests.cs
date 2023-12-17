@@ -37,7 +37,7 @@ public class SteamServicesStoreServiceTests
         Mock<ILogger<SteamStoreServices>> loggerMock = new();
 
         Mock<IGoogleSearchRepository> googleSearchRepositoryMock = new();
-        googleSearchRepositoryMock.Setup(_ => _.GetCustomSearchResultsAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(() => _mockedGoogleSearchRepositorySearchResults);
+        googleSearchRepositoryMock.Setup(_ => _.SearchAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(() => _mockedGoogleSearchRepositorySearchResults);
 
         // Create subject under test.
         _subjectUnderTest = new SteamStoreServices(httpClientFactoryMock.Object, loggerMock.Object,
