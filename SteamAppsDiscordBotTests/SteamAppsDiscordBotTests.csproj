@@ -31,8 +31,4 @@
         <ProjectReference Include="..\SteamAppsDiscordBot\SteamAppsDiscordBot.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="SteamServices\TestData" />
-    </ItemGroup>
-
 </Project>
