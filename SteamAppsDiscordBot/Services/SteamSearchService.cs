@@ -7,9 +7,9 @@ namespace SteamAppsDiscordBot.Services;
 /// <summary>
 /// Represents a Google Custom Search service that implements the IGoogleSearchRepository interface.
 /// </summary>
-public class GoogleCustomSearchService : IGoogleSearchRepository
+public class SteamSearchService : IGoogleSearchRepository
 {
-    private readonly ILogger<GoogleCustomSearchService> _logger;
+    private readonly ILogger<SteamSearchService> _logger;
     private readonly HttpClient _httpClient;
     private readonly string _cx;
     private readonly string _googleApiKey;
@@ -20,8 +20,8 @@ public class GoogleCustomSearchService : IGoogleSearchRepository
     /// <param name="googleOptions">Options for Google Custom Search.</param>
     /// <param name="httpClientFactory">Factory for creating HttpClient instances.</param>
     /// <param name="logger">Logger for logging messages.</param>
-    public GoogleCustomSearchService(IOptions<GoogleOptions> googleOptions, IHttpClientFactory httpClientFactory,
-        ILogger<GoogleCustomSearchService> logger)
+    public SteamSearchService(IOptions<GoogleOptions> googleOptions, IHttpClientFactory httpClientFactory,
+        ILogger<SteamSearchService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedgoogle");
         _logger = logger;

@@ -8,11 +8,11 @@ using SteamAppsDiscordBot.Services;
 
 namespace SteamAppsDiscordBotTests.GoogleService;
 
-public class GoogleCustomSearchServiceTests
+public class SteamSearchServiceTests
 {
     private const string CUSTOM_SEARCH_GOOGLEAPIS_URL = "https://content-customsearch.googleapis.com/customsearch/v1";
 
-    private readonly Mock<ILogger<GoogleCustomSearchService>> _loggerMock;
+    private readonly Mock<ILogger<SteamSearchService>> _loggerMock;
     private readonly Mock<IOptions<GoogleOptions>> _googleOptionsMock;
 
     private readonly HttpResponseMessage _mockedHttpClientsResponseMessage = new(HttpStatusCode.OK)
@@ -20,9 +20,9 @@ public class GoogleCustomSearchServiceTests
         Content = new StringContent("Default response content.")
     };
 
-    private readonly GoogleCustomSearchService? _subjectUnderTest;
+    private readonly SteamSearchService? _subjectUnderTest;
 
-    public GoogleCustomSearchServiceTests()
+    public SteamSearchServiceTests()
     {
         // Setup _googleOptionsMock.
         _googleOptionsMock = new Mock<IOptions<GoogleOptions>>();
@@ -50,13 +50,13 @@ public class GoogleCustomSearchServiceTests
             .Returns(httpClient);
 
         // Setup _loggerMock.
-        _loggerMock = new Mock<ILogger<GoogleCustomSearchService>>();
+        _loggerMock = new Mock<ILogger<SteamSearchService>>();
 
         // TODO: Testing a singleton.
         _subjectUnderTest = null;
         
         // Setup _subjectUnderTest.
-        _subjectUnderTest = new GoogleCustomSearchService(_googleOptionsMock.Object, httpClientFactoryMock.Object,
+        _subjectUnderTest = new SteamSearchService(_googleOptionsMock.Object, httpClientFactoryMock.Object,
             _loggerMock.Object);
     }
 
@@ -78,7 +78,7 @@ public class GoogleCustomSearchServiceTests
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var steamStoreRepository = new GoogleCustomSearchService(_googleOptionsMock.Object,
+        var steamStoreRepository = new SteamSearchService(_googleOptionsMock.Object,
             httpClientFactoryMock.Object, _loggerMock.Object);
 
         // Act.
@@ -112,7 +112,7 @@ public class GoogleCustomSearchServiceTests
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var steamStoreRepository = new GoogleCustomSearchService(_googleOptionsMock.Object,
+        var steamStoreRepository = new SteamSearchService(_googleOptionsMock.Object,
             httpClientFactoryMock.Object, _loggerMock.Object);
 
         // Act.
