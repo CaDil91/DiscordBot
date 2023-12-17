@@ -119,6 +119,7 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     /// <param name="allowedMentions">Allowed mention types for the message. Optional.</param>
     /// <param name="options">Options for sending the message. Optional.</param>
     /// <param name="components">Message components to include in the message. Optional.</param>
+    [ExcludeFromCodeCoverage]
     private async Task FollowupWrapperAsync(string message, Embed[]? embeds = null, bool isTTS = false,
         bool ephemeral = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null,
         MessageComponent? components = null)
