@@ -5,7 +5,8 @@ using Newtonsoft.Json;
 namespace SteamAppsDiscordBot.Services;
 
 /// <summary>
-/// Represents a Google Custom Search service that implements the IGoogleSearchRepository interface.
+/// Represents a service for searching using a Google Programmable Search setup to search the Steam Store.
+/// Implements the <see cref="IGoogleSearchRepository"/> interface.
 /// </summary>
 public class SteamSearchService : IGoogleSearchRepository
 {
@@ -29,10 +30,17 @@ public class SteamSearchService : IGoogleSearchRepository
         _googleApiKey = googleOptions.Value.Key;
     }
 
-    
-    public async Task<List<Uri>> SearchAsync(string sQuery, int iCount = 10)
+
+    /// <summary>
+    /// Searches Steam Store for the given query and retrieves a list of search results.
+    /// </summary>
+    /// <param name="sQuery">The search query.</param>
+    /// <param name="iCount">The number of search results to retrieve. Default is 3.</param>
+    /// <returns>A list of URIs representing the search results, or an empty list if the search fails or no results are found.</returns>
+    public async Task<List<Uri>> SearchAsync(string sQuery, int iCount = 3)
     {
-        HttpResponseMessage response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
+        HttpResponseMessage response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get,
+            new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogWarning("Failed to get results from google. Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);

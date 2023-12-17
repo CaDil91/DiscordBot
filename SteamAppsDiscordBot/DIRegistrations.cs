@@ -60,7 +60,7 @@ public static class DIRegistrations
         services.AddHttpClient("hardcodedsteam");
         services.AddDbContext<SteamNewsDatabaseContext>(options => 
             options.UseSqlServer(Environment.GetEnvironmentVariable("SteamNewsDbConnectionString")!));
-        services.AddSingleton<ISteamStoreService, SteamStoreServices>();
+        services.AddSingleton<ISteamStoreService, SteamStoreService>();
         
         services.AddOptions<SteamOptions>()
             .Configure<IConfiguration>((options, configuration) =>

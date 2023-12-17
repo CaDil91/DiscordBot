@@ -4,19 +4,23 @@ using SteamAppsDiscordBot.Services.DTO;
 
 namespace SteamAppsDiscordBot.Services;
 
-public class SteamStoreServices : ISteamStoreService
+/// <summary>
+/// Represents a service that interacts with the Steam store.
+/// </summary>
+public class SteamStoreService : ISteamStoreService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<SteamStoreServices> _logger;
+    private readonly ILogger<SteamStoreService> _logger;
     private readonly IGoogleSearchRepository _steamStoreRepository;
 
     /// <summary>
-    /// TODO: Add documentation.
+    /// The SteamStoreServices class is responsible for fetching data from the Steam Store API.
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="httpClientFactory"></param>
-    /// <param name="steamStoreRepository"></param>
-    public SteamStoreServices(IHttpClientFactory httpClientFactory, ILogger<SteamStoreServices> logger, IGoogleSearchRepository steamStoreRepository)
+    /// <param name="httpClientFactory">An instance of IHttpClientFactory used to create an HttpClient for making HTTP requests.</param>
+    /// <param name="logger">An instance of ILogger used for logging.</param>
+    /// <param name="steamStoreRepository">An instance of IGoogleSearchRepository used for interacting with the Steam store repository.</param>
+    public SteamStoreService(IHttpClientFactory httpClientFactory, ILogger<SteamStoreService> logger,
+        IGoogleSearchRepository steamStoreRepository)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
         _logger = logger;

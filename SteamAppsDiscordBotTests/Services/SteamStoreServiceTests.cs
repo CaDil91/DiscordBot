@@ -9,7 +9,7 @@ namespace SteamAppsDiscordBotTests.Services;
 
 public class SteamServicesStoreServiceTests
 {
-    private readonly SteamStoreServices _subjectUnderTest;
+    private readonly SteamStoreService _subjectUnderTest;
 
     private List<Uri> _mockedGoogleSearchRepositorySearchResults;
     private HttpResponseMessage _mockedHttpClientResponseMessage;
@@ -34,13 +34,13 @@ public class SteamServicesStoreServiceTests
         Mock<IHttpClientFactory> httpClientFactoryMock = new();
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        Mock<ILogger<SteamStoreServices>> loggerMock = new();
+        Mock<ILogger<SteamStoreService>> loggerMock = new();
 
         Mock<IGoogleSearchRepository> googleSearchRepositoryMock = new();
         googleSearchRepositoryMock.Setup(_ => _.SearchAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(() => _mockedGoogleSearchRepositorySearchResults);
 
         // Create subject under test.
-        _subjectUnderTest = new SteamStoreServices(httpClientFactoryMock.Object, loggerMock.Object,
+        _subjectUnderTest = new SteamStoreService(httpClientFactoryMock.Object, loggerMock.Object,
             googleSearchRepositoryMock.Object);
     }
 
