@@ -46,7 +46,7 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     public async Task GetSteamAppAsync(string appName)
     {
         // Defer the response to avoid the "Thinking..." state
-        await DeferWrapperAsync();
+        //await DeferWrapperAsync();
         
         // Get the first result only.
         List<SteamApp> steamApps = await _steamStoreServices.GetAppsAsync(appName, 1).ConfigureAwait(false);
@@ -113,20 +113,21 @@ public class SteamAppCommands : InteractionModuleBase<SocketInteractionContext>
     /// Wraps the FollowupAsync method to handle exceptions and log errors.
     /// </summary>
     /// <param name="message">The content of the follow-up message.</param>
+    /// <param name="messageReference"></param>
     /// <param name="embeds">An array of embeds to include in the message. Optional.</param>
     /// <param name="isTTS">Indicates if the message should be sent with text-to-speech. Default is false.</param>
-    /// <param name="ephemeral">Indicates if the message should be ephemeral. Default is false.</param>
     /// <param name="allowedMentions">Allowed mention types for the message. Optional.</param>
     /// <param name="options">Options for sending the message. Optional.</param>
     /// <param name="components">Message components to include in the message. Optional.</param>
     [ExcludeFromCodeCoverage]
-    private async Task FollowupWrapperAsync(string message, Embed[]? embeds = null, bool isTTS = false,
-        bool ephemeral = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null,
+    private async Task FollowupWrapperAsync(string message, MessageReference? messageReference = null, Embed[]? embeds = null,
+        bool isTTS = false, AllowedMentions? allowedMentions = null, RequestOptions? options = null,
         MessageComponent? components = null)
     {
         try
         {
-            await FollowupAsync(message, embeds, isTTS, ephemeral, allowedMentions, options, components);
+            await ReplyAsync(message, isTTS, embeds!.FirstOrDefault(), options, allowedMentions, messageReference, components);
+            //await FollowupAsync(message, embeds, isTTS, ephemeral, allowedMentions, options, components);
         }
         catch (Exception e)
         {

@@ -6,11 +6,11 @@ namespace SteamAppsDiscordBot.Services;
 
 /// <summary>
 /// Represents a service for searching using a Google Programmable Search setup to search the Steam Store.
-/// Implements the <see cref="IGoogleSearchRepository"/> interface.
+/// Implements the <see cref="IGoogleSearchService"/> interface.
 /// </summary>
-public class SteamSearchService : IGoogleSearchRepository
+public class SteamStoreSearchService : IGoogleSearchService
 {
-    private readonly ILogger<SteamSearchService> _logger;
+    private readonly ILogger<SteamStoreSearchService> _logger;
     private readonly HttpClient _httpClient;
     private readonly string _cx;
     private readonly string _googleApiKey;
@@ -21,8 +21,8 @@ public class SteamSearchService : IGoogleSearchRepository
     /// <param name="googleOptions">Options for Google Custom Search.</param>
     /// <param name="httpClientFactory">Factory for creating HttpClient instances.</param>
     /// <param name="logger">Logger for logging messages.</param>
-    public SteamSearchService(IOptions<GoogleOptions> googleOptions, IHttpClientFactory httpClientFactory,
-        ILogger<SteamSearchService> logger)
+    public SteamStoreSearchService(IOptions<GoogleOptions> googleOptions, IHttpClientFactory httpClientFactory,
+        ILogger<SteamStoreSearchService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedgoogle");
         _logger = logger;
@@ -34,13 +34,13 @@ public class SteamSearchService : IGoogleSearchRepository
     /// <summary>
     /// Searches Steam Store for the given query and retrieves a list of search results.
     /// </summary>
-    /// <param name="sQuery">The search query.</param>
+    /// <param name="searchTerm">The search query.</param>
     /// <param name="iCount">The number of search results to retrieve. Default is 3.</param>
     /// <returns>A list of URIs representing the search results, or an empty list if the search fails or no results are found.</returns>
-    public async Task<List<Uri>> SearchAsync(string sQuery, int iCount = 3)
+    public async Task<List<Uri>> SearchAsync(string searchTerm, int iCount = 3)
     {
         HttpResponseMessage response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get,
-            new Uri($"{_httpClient.BaseAddress}?&q={sQuery}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
+            new Uri($"{_httpClient.BaseAddress}?&q={searchTerm}&key={_googleApiKey}&cx={_cx}&lr=lang_en")));
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogWarning("Failed to get results from google. Status Code: {StatusCode}. Reason: {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);

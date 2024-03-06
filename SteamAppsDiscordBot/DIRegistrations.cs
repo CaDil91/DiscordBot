@@ -80,7 +80,7 @@ public static class DIRegistrations
     {
         //change
         services.AddHttpClient("hardcodedgoogle", client => { client.BaseAddress = new Uri("https://www.googleapis.com/customsearch/v1"); });
-        services.AddSingleton<IGoogleSearchRepository, SteamSearchService>();
+        services.AddSingleton<IGoogleSearchService, SteamStoreSearchService>();
         services.AddOptions<GoogleOptions>()
             .Configure<IConfiguration>((options, configuration) =>
             {

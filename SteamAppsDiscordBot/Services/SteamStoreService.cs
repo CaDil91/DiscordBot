@@ -11,52 +11,52 @@ public class SteamStoreService : ISteamStoreService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<SteamStoreService> _logger;
-    private readonly IGoogleSearchRepository _steamStoreRepository;
+    private readonly IGoogleSearchService _steamStoreGoogleSearch;
 
     /// <summary>
     /// The SteamStoreServices class is responsible for fetching data from the Steam Store API.
     /// </summary>
     /// <param name="httpClientFactory">An instance of IHttpClientFactory used to create an HttpClient for making HTTP requests.</param>
     /// <param name="logger">An instance of ILogger used for logging.</param>
-    /// <param name="steamStoreRepository">An instance of IGoogleSearchRepository used for interacting with the Steam store repository.</param>
+    /// <param name="steamStoreGoogleSearch">An instance of IGoogleSearchRepository used for interacting with the Steam store repository.</param>
     public SteamStoreService(IHttpClientFactory httpClientFactory, ILogger<SteamStoreService> logger,
-        IGoogleSearchRepository steamStoreRepository)
+        IGoogleSearchService steamStoreGoogleSearch)
     {
         _httpClient = httpClientFactory.CreateClient("hardcodedsteam");
         _logger = logger;
-        _steamStoreRepository = steamStoreRepository;
+        _steamStoreGoogleSearch = steamStoreGoogleSearch;
     }
 
     /// <summary>
     /// Search the Steam store by a given search term.
     /// </summary>
     /// <param name="searchTerm">The search parameter to query to the Steam Store by.</param>
-    /// <param name="iAppReturnCountMax"></param>
+    /// <param name="iMaxReturnCount"></param>
     /// <returns>List of App Id's for the given search</returns>
-    public async Task<List<SteamApp>> GetAppsAsync(string searchTerm = "", int iAppReturnCountMax = 3)
+    public async Task<List<SteamApp>> GetAppsAsync(string searchTerm = "", int iMaxReturnCount = 3)
     {
-        // Get top results from custom google search api.
-        List<Uri> searchResults = await _steamStoreRepository.SearchAsync(searchTerm, iAppReturnCountMax);
+        // Google search the Steam store for the given search term.
+        List<Uri> searchResults = await _steamStoreGoogleSearch.SearchAsync(searchTerm, iMaxReturnCount).ConfigureAwait(false);
         if (searchResults.Count == 0) return new List<SteamApp>();
         
         // Get the app id's from the search results.
-        List<string> appIds = searchResults.Select(result => result.AbsoluteUri.Split("/")[4]).ToList();
-        appIds = appIds.Distinct().Where(appId => !string.IsNullOrEmpty(appId)).ToList();
+        IEnumerable<string> appIds = ExtractAppIds(searchResults);
+
+        // Asynchronously get the SteamApp for each appId.
+        List<Task<SteamApp?>> getAppTasks = appIds.Select(GetSteamAppAsync).ToList();
+        SteamApp?[] apps = await Task.WhenAll(getAppTasks);
         
-        // Get the SteamApp's from the app id's.
-        List<SteamApp> steamApps = new();
-        foreach (string appId in appIds)
-        {
-            SteamApp? steamApp = await GetSteamAppAsync(appId);
-            if (steamApp != null) steamApps.Add(steamApp);
-        }
-        
-        return steamApps;
+        return apps
+            .Where(app => app != null)
+            .Select(app => app!) // We know from the above check that app is not null
+            .ToList();
     }
 
-    public Task<List<SteamApp>> GetAppAsync(string searchTerm)
+    private static IEnumerable<string> ExtractAppIds(IEnumerable<Uri> searchResults)
     {
-        throw new NotImplementedException();
+        List<string> appIds = searchResults.Select(result => result.AbsoluteUri.Split("/")[4]).ToList();
+        appIds = appIds.Distinct().Where(appId => !string.IsNullOrEmpty(appId)).ToList();
+        return appIds;
     }
 
     /// <summary>
